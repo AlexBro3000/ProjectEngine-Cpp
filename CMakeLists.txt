@@ -24,3 +24,6 @@ target_link_libraries(${PROJECT_NAME} glad)
 # Добавление поддиректории с библиотекой GLFW и связывание её с проектом.
 add_subdirectory(lib/glfw)
 target_link_libraries(${PROJECT_NAME} glfw)
+# Добавление поддиректории с библиотекой GLM и связывание её с проектом.
+add_subdirectory(lib/glm)
+target_link_libraries(${PROJECT_NAME} glm)
