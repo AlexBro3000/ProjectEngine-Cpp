@@ -2,7 +2,7 @@
 cmake_minimum_required(VERSION 3.27.9 FATAL_ERROR)
 
 # Название проекта.
-project(Project-EngineGame)
+project(ProjectEngine-Cpp)
 
 # Указание стандарта C++17 для компиляции.
 set(CMAKE_CXX_STANDARD 17)
@@ -11,7 +11,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # Указание исходных файлов и ресурсов.
 file(GLOB_RECURSE SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/**/*.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/**/*.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/**/*.h
+	
     ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp
 )
 file(GLOB_RECURSE RESOURCES
@@ -52,6 +54,6 @@ add_subdirectory(lib/glm)
 target_link_libraries(${PROJECT_NAME} glad glfw glm)
 
 # Добавление библиотеки stb как объектной библиотеки и связывание её с проектом.
-# add_library(stb INTERFACE)
-# target_include_directories(stb INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/lib/stb)
-# target_link_libraries(${PROJECT_NAME} stb)
+add_library(stb INTERFACE)
+target_include_directories(stb INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/lib/stb)
+target_link_libraries(${PROJECT_NAME} stb)
