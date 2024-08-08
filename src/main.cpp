@@ -1,3 +1,4 @@
+#include "manager/manager.hpp"
 #include "system/system.hpp"
 #include <thread>
 
@@ -7,6 +8,8 @@
 
 int main(int argc, char** argv)
 {
+    ResourceManager::Init(argc, argv);
+
     Window::Init(WIDTH, HEIGHT, TITLE);
     Event::Init();
 
@@ -40,6 +43,8 @@ int main(int argc, char** argv)
         Window::swapBuffer();
         Event::update();
     }
+
+    ResourceManager::Terminate();
 
     Window::Terminate();
     Event::Terminate();
