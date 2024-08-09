@@ -103,7 +103,7 @@ void Event::funcWindowSizeCallback(GLFWwindow* window, int width, int height)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/////                                MOUSE                                 /////
+/////   EVENT :: MOUSE                                                     /////
 ////////////////////////////////////////////////////////////////////////////////
 
 glm::vec2 Event::Mouse::getPosition()
@@ -164,7 +164,7 @@ bool Event::Mouse::isValidButton(int button)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/////                               KEYBOARD                               /////
+/////   EVENT :: KEYBOARD                                                  /////
 ////////////////////////////////////////////////////////////////////////////////
 
 bool Event::Keyboard::isPressed(int key)

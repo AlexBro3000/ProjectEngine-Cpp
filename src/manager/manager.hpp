@@ -3,3 +3,5 @@
 #include <stb_image.h>
 
 #include "resource/ResourceManager.h"
+#include "shader/ShaderManager.h"
+#include "texture/TextureManager.h"

@@ -10,6 +10,9 @@ public:
 	static bool Init(int argc, char** argv);
 	static void Terminate();
 
+	friend class ShaderManager;
+	friend class TextureManager;
+
 private:
 	ResourceManager() = delete;
 	~ResourceManager() = delete;

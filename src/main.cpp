@@ -9,9 +9,16 @@
 int main(int argc, char** argv)
 {
     ResourceManager::Init(argc, argv);
+    ShaderManager::  Init();
+    TextureManager:: Init();
 
     Window::Init(WIDTH, HEIGHT, TITLE);
     Event::Init();
+
+    /*ShaderProgram temp = ShaderProgram(
+        "C:/Users/alexb/Desktop/ProjectEngine-Cpp/build/Debug/res/shaders/main_vert.glsl",
+        "C:/Users/alexb/Desktop/ProjectEngine-Cpp/build/Debug/res/shaders/main_frag.glsl"
+    );*/
 
     float FPS = 1.0f / 40.0f;
     float crntTime = glfwGetTime();
@@ -45,6 +52,8 @@ int main(int argc, char** argv)
     }
 
     ResourceManager::Terminate();
+    ShaderManager::  Terminate();
+    TextureManager:: Terminate();
 
     Window::Terminate();
     Event::Terminate();
