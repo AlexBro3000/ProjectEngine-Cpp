@@ -1,30 +1,7 @@
 #include "Texture.h"
+#include "../../graphic/texture/Image.h"
 #include "../../system/console/Console.h"
 #include <stb_image.h>
-
-////////////////////////////////////////////////////////////////////////////////
-/////   IMAGE                                                              /////
-////////////////////////////////////////////////////////////////////////////////
-
-unsigned char* Image::load(const std::string& path, int* width, int* height, int* channels)
-{
-	stbi_set_flip_vertically_on_load(true);
-	unsigned char* data = stbi_load(path.c_str(), width, height, channels, 0);
-
-	if (data) {
-		Console::Info("The texture file was read successfully.",
-			{ "Path: " + path });
-	}
-	else {
-		Console::Warn("Failed to read texture file.",
-			{ "Path: " + path });
-	}
-	return data;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/////   TEXTURE                                                            /////
-////////////////////////////////////////////////////////////////////////////////
 
 Texture::Texture(const std::string& path, GLenum slot, GLint format, GLenum pxl_format, GLenum pxl_type) :
 	ID(0), slot(slot)
