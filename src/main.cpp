@@ -1,8 +1,7 @@
-#include "graphic/buffer/VAO.h"
-#include "graphic/buffer/VBO.h"
+#include "graphic/mesh/Mesh.h"
 #include "manager/manager.hpp"
-#include "object/camera/Camera.h"
 #include "system/system.hpp"
+#include "object/camera/Camera.h"
 #include <glad/glad.h>
 #include <thread>
 
@@ -13,12 +12,12 @@
 float vertices[] = {
     // x    y     z     u     v
    -0.25f,-0.25f, 0.0f, 0.0f, 0.0f,
-    0.25f,-0.25f, 0.0f, 1.0f, 0.0f,
-   -0.25f, 0.25f, 0.0f, 0.0f, 1.0f,
+    0.25f,-0.25f, 0.0f, 2.0f, 0.0f,
+   -0.25f, 0.25f, 0.0f, 0.0f, 2.0f,
 
-    0.25f,-0.25f, 0.0f, 1.0f, 0.0f,
-    0.25f, 0.25f, 0.0f, 1.0f, 1.0f,
-   -0.25f, 0.25f, 0.0f, 0.0f, 1.0f,
+    0.25f,-0.25f, 0.0f, 2.0f, 0.0f,
+    0.25f, 0.25f, 0.0f, 2.0f, 2.0f,
+   -0.25f, 0.25f, 0.0f, 0.0f, 2.0f,
 };
 
 int main(int argc, char** argv)
@@ -42,18 +41,12 @@ int main(int argc, char** argv)
 
     // MESH
 
-    VAO vao = VAO();
-    VBO vbo = VBO();
+    int attr[] = {
+        3, 2, -1
+    };
 
-    vao.bind();
-    vbo.bind();
-    vbo.setData(vertices, sizeof(vertices), GL_STATIC_DRAW);
-
-    vao.linkAttrib(vbo, 0, 3, GL_FLOAT, 5 * sizeof(GLfloat), (GLvoid*)(0 * sizeof(GLfloat)));
-    vao.linkAttrib(vbo, 1, 2, GL_FLOAT, 5 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
-
-    vao.unbind();
-    vbo.unbind();
+    Mesh mesh;
+    mesh.build(vertices, 6, attr, GL_STATIC_DRAW);
 
     // CAMERA
 
@@ -127,9 +120,7 @@ int main(int argc, char** argv)
 
         texture->bind();
 
-        vao.bind();
-        glDrawArrays(GL_TRIANGLES, 0, 6);
-        glBindVertexArray(0);
+        mesh.render();
 
         Window::swapBuffer();
         Event::update();
