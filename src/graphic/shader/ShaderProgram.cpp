@@ -51,3 +51,8 @@ bool ShaderProgram::is() const
 {
 	return (ID != 0) && glIsProgram(ID);
 }
+
+GLint ShaderProgram::getUniformLocation(const std::string& name) const
+{
+	return glGetUniformLocation(ID, name.c_str());
+}

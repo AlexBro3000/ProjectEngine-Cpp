@@ -1,6 +1,7 @@
 #include "graphic/buffer/VAO.h"
 #include "graphic/buffer/VBO.h"
 #include "manager/manager.hpp"
+#include "object/camera/Camera.h"
 #include "system/system.hpp"
 #include <glad/glad.h>
 #include <thread>
@@ -54,7 +55,13 @@ int main(int argc, char** argv)
     vao.unbind();
     vbo.unbind();
 
+    // CAMERA
 
+    Camera camera = Camera(glm::vec3(0.0f, 0.0f, 1.0f), glm::ivec3(0), glm::vec3(0.0f), 80.0f, 0.1f, 100.0f);
+
+
+
+    glm::mat4 model = glm::mat4(1.0f);
 
     float FPS = 1.0f / 40.0f;
     float crntTime = glfwGetTime();
@@ -81,11 +88,43 @@ int main(int argc, char** argv)
                 else
                     Event::Mouse::lock(true);
             }
+
+            if (Event::Keyboard::isHeld(GLFW_KEY_W)) {
+                camera.move(glm::vec3(0, 0, 1.0f) * delta_time);
+            }
+            if (Event::Keyboard::isHeld(GLFW_KEY_S)) {
+                camera.move(glm::vec3(0, 0, -1.0f) * delta_time);
+            }
+            if (Event::Keyboard::isHeld(GLFW_KEY_D)) {
+                camera.move(glm::vec3(1.0f, 0, 0) * delta_time);
+            }
+            if (Event::Keyboard::isHeld(GLFW_KEY_A)) {
+                camera.move(glm::vec3(-1.0f, 0, 0) * delta_time);
+            }
+            if (Event::Keyboard::isHeld(GLFW_KEY_SPACE)) {
+                camera.move(glm::vec3(0, 1.0f, 0) * delta_time);
+            }
+            if (Event::Keyboard::isHeld(GLFW_KEY_LEFT_SHIFT)) {
+                camera.move(glm::vec3(0, -1.0f, 0) * delta_time);
+            }
+
+
+
+            if (Event::Mouse::isLocked()) {
+                camera.rotate(glm::vec3(
+                    -Event::Mouse::getPositionDelta().y,
+                    -Event::Mouse::getPositionDelta().x,
+                    0.0f
+                ) * 0.05f);
+            }
         }
 
         glClear(GL_COLOR_BUFFER_BIT);
 
         shader->use();
+        shader->setUniform("model", model);
+        shader->setUniform("projview", camera.getProjection() * camera.getView());
+
         texture->bind();
 
         vao.bind();
