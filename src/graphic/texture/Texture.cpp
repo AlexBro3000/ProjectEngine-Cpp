@@ -3,11 +3,14 @@
 #include "../../system/console/Console.h"
 #include <stb_image.h>
 
-Texture::Texture(const std::string& path, GLenum slot, GLint format, GLenum pxl_format, GLenum pxl_type) :
+Texture::Texture(const std::string& path, GLenum slot, GLint format) :
 	ID(0), slot(slot)
 {
 	int width, height, channels;
 	unsigned char* data = Image::load(path, &width, &height, &channels);
+
+	GLenum pxl_format = (channels == 4) ? GL_RGBA : GL_RGB;
+	GLenum pxl_type= GL_UNSIGNED_BYTE;
 
 	if (data) {
 		glGenTextures(1, &ID);
@@ -18,14 +21,13 @@ Texture::Texture(const std::string& path, GLenum slot, GLint format, GLenum pxl_
 		glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, pxl_format, pxl_type, data);
 		glGenerateMipmap(GL_TEXTURE_2D);
 
-		stbi_image_free(data);
-
 		// Установка параметров текстуры
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
+		stbi_image_free(data);
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 }

@@ -8,8 +8,10 @@ private:
 	GLuint ID;
 	GLenum slot;
 
+	friend class TextureManager;
+
 public:
-	Texture(const std::string& path, GLenum slot, GLint format, GLenum pxl_format, GLenum pxl_type);
+	Texture(const std::string& path, GLenum slot, GLint format);
 	~Texture();
 
 	void bind();

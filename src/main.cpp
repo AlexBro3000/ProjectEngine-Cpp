@@ -12,16 +12,28 @@
 float vertices[] = {
     // x    y     z     u     v
    -0.25f,-0.25f, 0.0f, 0.0f, 0.0f,
-    0.25f,-0.25f, 0.0f, 2.0f, 0.0f,
-   -0.25f, 0.25f, 0.0f, 0.0f, 2.0f,
+    0.25f,-0.25f, 0.0f, 1.0f, 0.0f,
+   -0.25f, 0.25f, 0.0f, 0.0f, 1.0f,
 
-    0.25f,-0.25f, 0.0f, 2.0f, 0.0f,
-    0.25f, 0.25f, 0.0f, 2.0f, 2.0f,
-   -0.25f, 0.25f, 0.0f, 0.0f, 2.0f,
+    0.25f,-0.25f, 0.0f, 1.0f, 0.0f,
+    0.25f, 0.25f, 0.0f, 1.0f, 1.0f,
+   -0.25f, 0.25f, 0.0f, 0.0f, 1.0f,
 };
 
 int main(int argc, char** argv)
 {
+    //auto stoneBlock = BlockRegistry::CreateBlock("stone");
+    //if (stoneBlock) {
+    //    Console::Info("Block name.", { stoneBlock->GetName() });;
+    //}
+
+    //auto woodBlock = BlockRegistry::CreateBlock("wood");
+    //if (woodBlock) {
+    //    Console::Info("Block name.", { woodBlock->GetName() });
+    //}
+
+    //return 0;
+
     ResourceManager::Init(argc, argv);
     ShaderManager::  Init();
     TextureManager:: Init();
@@ -36,8 +48,10 @@ int main(int argc, char** argv)
 
     // TEXTURE
 
-    TextureManager::Texture::load("Brick", "\\res\\textures\\brick.png", GL_TEXTURE0, GL_RGBA, GL_RGB, GL_UNSIGNED_BYTE);
-    Texture* texture = TextureManager::Texture::get("Brick").get();
+    TextureManager::TextureArray::load("Block", GL_TEXTURE0, GL_RGB, 256, 256, 16);
+    TextureArray* texture = TextureManager::TextureArray::get("Block").get();
+
+    TextureManager::TextureArray::loadTexture("Block", "\\res\\textures\\Block.png", 4);
 
     // MESH
 
