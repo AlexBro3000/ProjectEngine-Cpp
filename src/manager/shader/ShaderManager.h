@@ -11,8 +11,6 @@ private:
     using ShaderProgramMap = std::map<std::string, std::shared_ptr<::ShaderProgram>>;
     static ShaderProgramMap shader_programs;
 
-    friend class ShaderProgram;
-
 public:
     static bool Init();
     static void Terminate();
@@ -20,9 +18,11 @@ public:
     class ShaderProgram
     {
     public:
-        static bool load(const std::string& name, const std::string& path_vert, const std::string& path_frag);
+        static bool load(const std::string& name);
         static void unload(const std::string& name);
         static std::shared_ptr<::ShaderProgram> get(const std::string& name);
+
+        static bool loadShader(const std::string& name, const std::string& path_vert, const std::string& path_frag);
 
     private:
         ShaderProgram() = delete;

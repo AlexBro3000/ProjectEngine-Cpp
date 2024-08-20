@@ -10,16 +10,18 @@ bool Window::Init(int width, int height, const std::string& title)
 {
     // Инициализация библиотеки GLFW
     if (!glfwInit()) {
-        Console::Error("Error initializing window control system.",
-            { "Error initializing GLFM library." });
+        Console::Error("Window system (Init)", {
+            "Error initializing window control system. Error initializing GLFM library."
+            });
         return false;
     }
     glfwSetErrorCallback([](int error, const char* description) {
         Console::Error("Error initializing window control system.",
             { description });
         });
-    Console::Info("Initializing the window control system.",
-        { "Initialization of GLFM library completed successfully." });
+    Console::Info("Window system (Init)", {
+        "Initializing the window control system. Initialization of GLFM library completed successfully."
+        });
 
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
@@ -30,24 +32,28 @@ bool Window::Init(int width, int height, const std::string& title)
     Window::window = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
     if (!Window::window) {
         glfwTerminate();
-        Console::Error("Error initializing window control system.",
-            { "Error creating application window." });
+        Console::Error("Window system (Init)", {
+            "Error initializing window control system. Error creating application window."
+            });
         return false;
     }
-    Console::Info("Initializing the window control system.",
-        { "Creation of the application window completed successfully." });
+    Console::Info("Window system (Init)", {
+        "Initializing the window control system. Creation of the application window completed successfully."
+        });
 
     glfwMakeContextCurrent(Window::window);
 
     // Инициализация библиотеки GLAD
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
         glfwTerminate();
-        Console::Error("Error initializing window control system.",
-            { "Error initializing GLAD library." });
+        Console::Error("Window system (Init)", {
+            "Error initializing window control system. Error initializing GLAD library."
+            });
         return false;
     }
-    Console::Info("Initializing the window control system.",
-        { "Initialization of GLAD library completed successfully." });
+    Console::Info("Window system (Init)", {
+        "Initializing the window control system. Initialization of GLAD library completed successfully."
+        });
 
     glViewport(0, 0, width, height);
 
@@ -56,10 +62,10 @@ bool Window::Init(int width, int height, const std::string& title)
     Window::height = height;
     Window::title = title;
 
-    Console::Info("Initialization of the window control system completed successfully.", {
-        "Display information about the OpenGL version and renderer.",
+    Console::Info("Window system (Init)", {
+        "Initialization of the window control system completed successfully. Display information about the OpenGL version and renderer.",
         std::string("OpenGL version: ") + reinterpret_cast<const char*>(glGetString(GL_VERSION)),
-        std::string("Renderer:       ") + reinterpret_cast<const char*>(glGetString(GL_RENDERER))
+        std::string("Renderer:       ") + reinterpret_cast<const char*>(glGetString(GL_RENDERER)),
         });
     return true;
 }
@@ -67,8 +73,9 @@ bool Window::Init(int width, int height, const std::string& title)
 void Window::Terminate()
 {
     glfwTerminate();
-    Console::Info("Terminating the window control system.",
-        { "The window control system has terminated." });
+    Console::Info("Window system (Terminate)", {
+        "Terminating the window control system completed successfully."
+        });
 }
 
 void Window::swapBuffer()

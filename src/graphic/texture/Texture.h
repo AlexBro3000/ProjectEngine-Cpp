@@ -7,11 +7,14 @@ class Texture
 private:
 	GLuint ID;
 	GLenum slot;
+    GLint format;
+
+	bool is_loaded;
 
 	friend class TextureManager;
 
 public:
-	Texture(const std::string& path, GLenum slot, GLint format);
+	Texture(GLenum slot, GLint format);
 	~Texture();
 
 	void bind();
@@ -20,4 +23,6 @@ public:
 	bool is();
 
 private:
+	bool load(const std::string& path);
+
 };

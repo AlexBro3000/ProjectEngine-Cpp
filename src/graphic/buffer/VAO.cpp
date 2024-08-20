@@ -1,7 +1,6 @@
 #include "VAO.h"
 
-VAO::VAO() :
-	ID(0)
+VAO::VAO() : ID(0)
 {
 	glGenVertexArrays(1, &ID);
 }
@@ -13,10 +12,8 @@ VAO::~VAO()
 
 void VAO::linkAttrib(const VBO& VBO, GLuint layout, GLuint components, GLenum type, GLsizei stride, const void* offset) const
 {
-	VBO.bind();
 	glVertexAttribPointer(layout, components, type, GL_FALSE, stride, offset);
 	glEnableVertexAttribArray(layout);
-	VBO.unbind();
 }
 
 void VAO::bind() const

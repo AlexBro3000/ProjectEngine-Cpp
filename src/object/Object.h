@@ -15,17 +15,12 @@ protected:
     glm::vec3 up;
 
 protected:
-    Object(
-        const glm::vec3& position = glm::vec3(0.0f),
-        const glm::ivec3& position_offset = glm::ivec3(0),
-        const glm::vec3& rotation = glm::vec3(0.0f)
-    );
-
+    Object(const glm::vec3& position = glm::vec3(0.0f), const glm::ivec3& position_offset = glm::ivec3(0), const glm::vec3& rotation = glm::vec3(0.0f));
     virtual ~Object() = default;
 
 public:
-    void setPosition(const glm::vec3& pos, const glm::ivec3& pos_offset);
-    void setRotation(const glm::vec3& rot);
+    void setPosition(const glm::vec3& position, const glm::ivec3& position_offset);
+    void setRotation(const glm::vec3& rotation);
 
     glm::vec3 getPosition() const;
     glm::ivec3 getPositionOffset() const;
@@ -35,8 +30,8 @@ public:
     glm::vec3 getRight() const;
     glm::vec3 getUp() const;
 
-    void move(const glm::vec3& pos_delta);
-    void rotate(const glm::vec3& rot_delta);
+    void move(const glm::vec3& position);
+    void rotate(const glm::vec3& rotation);
 
 private:
     void updatePosition();

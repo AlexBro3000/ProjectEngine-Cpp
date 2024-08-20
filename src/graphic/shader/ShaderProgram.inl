@@ -12,33 +12,9 @@ void ShaderProgram::setUniform(const std::string& name, const T& value) const
 		if constexpr (std::is_same_v<T, float>) {
             glUniform1f(location, value);
 		}
-		//else if constexpr (std::is_same_v<T, glm::vec1>) {
-		//	glUniform1f(location, value.x);
-		//}
-		//else if constexpr (std::is_same_v<T, glm::vec2>) {
-		//	glUniform2f(location, value.x, value.y);
-		//}
-		//else if constexpr (std::is_same_v<T, glm::vec3>) {
-		//	glUniform3f(location, value.x, value.y, value.z);
-		//}
-		//else if constexpr (std::is_same_v<T, glm::vec4>) {
-		//	glUniform4f(location, value.x, value.y, value.z, value.w);
-		//}
 		else if constexpr (std::is_same_v<T, int>) {
 			glUniform1i(location, value);
 		}
-		//else if constexpr (std::is_same_v<T, glm::ivec1>) {
-		//	glUniform1i(location, value.x);
-		//}
-		//else if constexpr (std::is_same_v<T, glm::ivec2>) {
-		//	glUniform2i(location, value.x, value.y);
-		//}
-		//else if constexpr (std::is_same_v<T, glm::ivec3>) {
-		//	glUniform3i(location, value.x, value.y, value.z);
-		//}
-		//else if constexpr (std::is_same_v<T, glm::ivec4>) {
-		//	glUniform4i(location, value.x, value.y, value.z, value.w);
-		//}
         else if constexpr (std::is_same_v<T, glm::vec3>) {
             glUniform3fv(location, 1, glm::value_ptr(value));
         }

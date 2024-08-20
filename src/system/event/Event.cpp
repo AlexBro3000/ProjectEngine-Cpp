@@ -25,15 +25,17 @@ bool Event::Init()
 	glfwSetKeyCallback(Window::window, funcKeyButtonCallback);
 	glfwSetWindowSizeCallback(Window::window, funcWindowSizeCallback);
 
-	Console::Info("Initialization of the event system completed successfully.",
-		{ "The event system has initialized." });
+	Console::Info("Event system (Init)", {
+		"Initialization of the event system completed successfully."
+		});
 	return true;
 }
 
 void Event::Terminate()
 {
-	Console::Info("Terminating the event system.",
-		{ "The event system has terminated." });
+	Console::Info("Event system (Terminate)", {
+		"Terminating the event system completed successfully."
+		});
 }
 
 void Event::update()
@@ -145,12 +147,7 @@ bool Event::Mouse::isHeld(int button)
 void Event::Mouse::lock(bool lock)
 {
     Event::mouse_locked = lock;
-    if (lock) {
-        glfwSetInputMode(Window::window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-    }
-    else {
-        glfwSetInputMode(Window::window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-    }
+    glfwSetInputMode(Window::window, GLFW_CURSOR, lock ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL);
 }
 
 bool Event::Mouse::isLocked()

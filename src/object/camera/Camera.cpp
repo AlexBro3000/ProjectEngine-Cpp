@@ -6,9 +6,6 @@ Camera::Camera(const glm::vec3& position, const glm::ivec3& position_offset, con
 	Object(position, position_offset, rotation), fov(fov), near(near), far(far)
 { }
 
-Camera::~Camera()
-{ }
-
 glm::mat4 Camera::getProjection()
 {
 	float aspect = (float)Window::getWidth() / (float)Window::getHeight();
@@ -21,17 +18,17 @@ glm::mat4 Camera::getView()
 	return glm::lookAt(pos, pos + forward, up);
 }
 
-void Camera::move(const glm::vec3& pos_delta)
+void Camera::move(const glm::vec3& position)
 {
 	glm::vec3 pos = glm::vec3(0.0f);
-	pos += forward * pos_delta.z;
-	pos += right * pos_delta.x;
-	pos += up * pos_delta.y;
+	pos += forward * position.z;
+	pos += right * position.x;
+	pos += up * position.y;
 
 	Object::move(pos);
 }
 
-void Camera::rotate(const glm::vec3& rot_delta)
+void Camera::rotate(const glm::vec3& rotation)
 {
-	Object::rotate(rot_delta);
+	Object::rotate(rotation);
 }

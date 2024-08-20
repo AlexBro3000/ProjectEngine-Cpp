@@ -2,43 +2,15 @@
 #include "../../graphic/shader/Shader.h"
 #include "../../system/console/Console.h"
 
-ShaderProgram::ShaderProgram(const std::string& path_vert, const std::string& path_frag) :
+ShaderProgram::ShaderProgram() :
 	ID(0)
-{
-	Shader VS = Shader(GL_VERTEX_SHADER, path_vert);
-	Shader FS = Shader(GL_FRAGMENT_SHADER, path_frag);
-
-	if (VS.is() && FS.is()) {
-		GLuint shader_program = glCreateProgram();
-		glAttachShader(shader_program, VS.getId());
-		glAttachShader(shader_program, FS.getId());
-		glLinkProgram(shader_program);
-
-		GLint success;
-		glGetProgramiv(shader_program, GL_LINK_STATUS, &success);
-		if (success) {
-			if (ID) {
-				glDeleteProgram(ID);
-			}
-			ID = shader_program;
-		}
-		else {
-			GLchar info_log[512];
-			glGetProgramInfoLog(shader_program, 512, nullptr, info_log);
-			glDeleteProgram(shader_program);
-
-			Console::Warn("Failed to link shader program.", {
-				"Vertex shader, Path:   " + path_vert,
-				"Fragment shader, Path: " + path_frag,
-				info_log });
-		}
-	}
-}
+{ }
 
 ShaderProgram::~ShaderProgram()
 {
 	if (ShaderProgram::is()) {
 		glDeleteProgram(ID);
+		ID = 0;
 	}
 }
 
@@ -50,6 +22,43 @@ void ShaderProgram::use() const
 bool ShaderProgram::is() const
 {
 	return (ID != 0) && glIsProgram(ID);
+}
+
+bool ShaderProgram::load(const std::string& path_vert, const std::string& path_frag)
+{
+	if (ShaderProgram::is()) {
+		Console::Warn("Shader program already loaded.", {
+			"Path (Vertex shader):   " + path_vert,
+			"Path (Fragment shader): " + path_frag
+			});
+		return false;
+	}
+
+	Shader VS = Shader(GL_VERTEX_SHADER, path_vert);
+	Shader FS = Shader(GL_FRAGMENT_SHADER, path_frag);
+
+	if (VS.is() && FS.is()) {
+		ID = glCreateProgram();
+		glAttachShader(ID, VS.getId());
+		glAttachShader(ID, FS.getId());
+		glLinkProgram(ID);
+
+		GLint success;
+		glGetProgramiv(ID, GL_LINK_STATUS, &success);
+		if (!success) {
+			GLchar info_log[512];
+			glGetProgramInfoLog(ID, 512, nullptr, info_log);
+			glDeleteProgram(ID);
+
+			Console::Warn("Failed to link shader program.", {
+				"Path (Vertex shader):   " + path_vert,
+				"Path (Fragment shader): " + path_frag,
+				info_log });
+			return false;
+		}
+		return true;
+	}
+	return false;
 }
 
 GLint ShaderProgram::getUniformLocation(const std::string& name) const

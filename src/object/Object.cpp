@@ -11,16 +11,16 @@ Object::Object(const glm::vec3& position, const glm::ivec3& position_offset, con
 	updateRotation();
 }
 
-void Object::setPosition(const glm::vec3& pos, const glm::ivec3& pos_offset)
+void Object::setPosition(const glm::vec3& position, const glm::ivec3& position_offset)
 {
-	position = pos;
-	position_offset = pos_offset;
+    Object::position = position;
+    Object::position_offset = position_offset;
 	updatePosition();
 }
 
-void Object::setRotation(const glm::vec3& rot)
+void Object::setRotation(const glm::vec3& rotation)
 {
-	rotation = rot;
+    Object::rotation = rotation;
 	updateRotation();
 }
 
@@ -54,15 +54,15 @@ glm::vec3 Object::getUp() const
 	return up;
 }
 
-void Object::move(const glm::vec3& pos_delta)
+void Object::move(const glm::vec3& position)
 {
-    position += pos_delta;
+    Object::position += position;
     updatePosition();
 }
 
-void Object::rotate(const glm::vec3& rot_delta)
+void Object::rotate(const glm::vec3& rotation)
 {
-    rotation += rot_delta;
+    Object::rotation += rotation;
     updateRotation();
 }
 

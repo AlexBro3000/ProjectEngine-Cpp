@@ -7,8 +7,10 @@ class ShaderProgram
 private:
 	GLuint ID;
 
+	friend class ShaderManager;
+
 public:
-	ShaderProgram(const std::string& path_vert, const std::string& path_frag);
+	ShaderProgram();
 	~ShaderProgram();
 
 	template<typename T>
@@ -19,6 +21,8 @@ public:
 	bool is() const;
 
 private:
+	bool load(const std::string& path_vert, const std::string& path_frag);
+
 	GLint getUniformLocation(const std::string& name) const;
 
 };

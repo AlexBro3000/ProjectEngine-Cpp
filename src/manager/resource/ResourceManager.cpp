@@ -7,8 +7,8 @@ bool ResourceManager::Init(int argc, char** argv)
 {
 	ResourceManager::path = getLaunchDirectory(argv[0]);
 
-	Console::Info("Initialization of the resource manager completed successfully.", {
-		"Resource manager initialized.",
+	Console::Info("Resource manager (Init)", {
+		"Initialization of the resource manager completed successfully.",
 		"Launch directory: " + ResourceManager::path
 		});
 	return true;
@@ -16,8 +16,9 @@ bool ResourceManager::Init(int argc, char** argv)
 
 void ResourceManager::Terminate()
 {
-	Console::Info("Terminating the resource manager.",
-		{ "The resource manager has terminated." });
+	Console::Info("Resource manager (Terminate)", {
+		"Terminating the resource manager completed successfully."
+		});
 }
 
 std::string ResourceManager::getLaunchDirectory(const std::string& path)

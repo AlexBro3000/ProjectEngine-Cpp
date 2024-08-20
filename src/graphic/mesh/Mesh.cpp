@@ -1,9 +1,5 @@
 #include "Mesh.h"
 
-Mesh::Mesh() :
-	VAO(::VAO()), VBO(::VBO()), vertex_count(0)
-{ }
-
 void Mesh::build(const float* vertex_data, size_t vertex_count, const int* attrs, GLenum usage)
 {
     int vertex_size = 0;

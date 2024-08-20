@@ -15,9 +15,6 @@ private:
     using TextureArrayMap = std::map<std::string, std::shared_ptr<::TextureArray>>;
     static TextureArrayMap texture_arrays;
 
-    friend class Texture;
-    friend class TextureArray;
-
 public:
     static bool Init();
     static void Terminate();
@@ -25,9 +22,11 @@ public:
     class Texture
     {
     public:
-        static bool load(const std::string& name, const std::string& path, GLenum slot, GLint format);
+        static bool load(const std::string& name, GLenum slot, GLint format);
         static void unload(const std::string& name);
         static std::shared_ptr<::Texture> get(const std::string& name);
+
+        static bool loadTexture(const std::string& name, const std::string& path);
 
     private:
         Texture() = delete;
@@ -37,15 +36,17 @@ public:
     class TextureArray
     {
     public:
-        static bool load(const std::string& name, GLenum slot, GLint format, GLsizei width, GLsizei height, GLsizei depth);
+        static bool load(const std::string& name, GLenum slot, GLint format, int width, int height, int depth);
         static void unload(const std::string& name);
         static std::shared_ptr<::TextureArray> get(const std::string& name);
 
-        static void loadTexture(const std::string& name, const std::string& path, int layers);
+        static bool loadTexture(const std::string& name, const std::string& path, int layers);
 
     private:
         TextureArray() = delete;
         ~TextureArray() = delete;
+
+        static GLint getMaxDepth();
     };
 
 private:
