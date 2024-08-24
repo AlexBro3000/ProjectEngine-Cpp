@@ -4,7 +4,7 @@
 #include <stb_image.h>
 
 Texture::Texture(GLenum slot, GLint format) :
-	ID(0), slot(slot), format(format), is_loaded(false)
+	ID(0), slot(slot), format(format), f_texture_loaded(false)
 {
 	glGenTextures(1, &ID);
 
@@ -16,8 +16,6 @@ Texture::Texture(GLenum slot, GLint format) :
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-	// glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
@@ -25,9 +23,7 @@ Texture::~Texture()
 {
 	if (Texture::is()) {
 		glDeleteTextures(1, &ID);
-
-		ID = 0;
-		is_loaded = false;
+		f_texture_loaded = false;
 	}
 }
 
@@ -44,13 +40,13 @@ void Texture::unbind()
 
 bool Texture::is()
 {
-	return (ID != 0) && is_loaded && glIsTexture(ID);
+	return (ID != 0) && glIsTexture(ID);
 }
 
 bool Texture::load(const std::string& path)
 {
-	if (Texture::is()) {
-        Console::Warn("Texture already loaded.", { "Path: " + path });
+	if (Texture::is() && f_texture_loaded) {
+		Console::Warn("Texture already loaded.", { "Path: " + path });
 		return false;
 	}
 
@@ -63,16 +59,15 @@ bool Texture::load(const std::string& path)
 
 		Texture::bind();
         glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, pxl_format, pxl_type, data);
-        // glGenerateMipmap(GL_TEXTURE_2D);
 		Texture::unbind();
 
 		stbi_image_free(data);
-		is_loaded = true;
+		f_texture_loaded = true;
 
         Console::Info("Texture loaded successfully.", { "Path: " + path });
 	}
 	else {
 		Console::Warn("Failed to load texture.", { "Path: " + path });
 	}
-	return is_loaded;
+	return f_texture_loaded;
 }

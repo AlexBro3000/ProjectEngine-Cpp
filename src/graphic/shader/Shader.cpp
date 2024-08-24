@@ -27,7 +27,6 @@ Shader::~Shader()
 {
 	if (Shader::is()) {
 		glDeleteShader(ID);
-		ID = 0;
 	}
 }
 

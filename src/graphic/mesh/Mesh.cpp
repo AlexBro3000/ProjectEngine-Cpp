@@ -1,32 +1,59 @@
 #include "Mesh.h"
 
-void Mesh::build(const float* vertex_data, size_t vertex_count, const int* attrs, GLenum usage)
+////////////////////////////////////////////////////////////////////////////////
+/////     VERTEX                                                           /////
+////////////////////////////////////////////////////////////////////////////////
+
+void Vertex::Attrib()
 {
-    int vertex_size = 0;
-	for (size_t i = 0; attrs[i] != -1; i++) {
-		vertex_size += attrs[i];
-	}
-    this->vertex_count = vertex_count;
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
 
-    VAO.bind();
-    VBO.bind();
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texture_coords));
 
-    VBO.setData(vertex_data, vertex_count * vertex_size * sizeof(float), usage);
+    glEnableVertexAttribArray(2);
+    glVertexAttribIPointer(2, 1, GL_INT, sizeof(Vertex), (void*)offsetof(Vertex, texture_id));
+}
 
-    int offset = 0;
-    for (int i = 0; attrs[i] != -1; i++)
-    {
-        VAO.linkAttrib(VBO, i, attrs[i], GL_FLOAT, vertex_size * sizeof(float), (void*)(offset * sizeof(float)));
-        offset += attrs[i];
-    }
+////////////////////////////////////////////////////////////////////////////////
+/////     MESH                                                             /////
+////////////////////////////////////////////////////////////////////////////////
 
-    VAO.unbind();
-    VBO.unbind();
+Mesh::Mesh() :
+    VAO(0), VBO(0), EBO(0), count(0)
+{
+    glGenVertexArrays(1, &VAO);
+    glGenBuffers(1, &VBO);
+    glGenBuffers(1, &EBO);
+}
+
+Mesh::~Mesh()
+{
+    glDeleteVertexArrays(1, &VAO);
+    glDeleteBuffers(1, &VBO);
+    glDeleteBuffers(1, &EBO);
+}
+
+void Mesh::build(const std::vector<Vertex> vertices, const std::vector<unsigned int> indices, GLenum usage)
+{
+    glBindVertexArray(VAO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &vertices[0], usage);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], usage);
+
+    Vertex::Attrib();
+    count = indices.size();
+
+    glBindVertexArray(0);
 }
 
 void Mesh::render(GLenum primitive) const
 {
-    VAO.bind();
-    glDrawArrays(primitive, 0, static_cast<GLsizei>(vertex_count));
-    VAO.unbind();
+    glBindVertexArray(VAO);
+    glDrawElements(primitive, static_cast<unsigned int>(count), GL_UNSIGNED_INT, 0);
+    glBindVertexArray(0);
 }

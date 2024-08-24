@@ -4,21 +4,17 @@
 #include <stb_image.h>
 
 TextureArray::TextureArray(GLenum slot, GLint format, int width, int height, int depth)
-    : ID(0), slot(slot), format(format), is_loaded(false), width(width), height(height), depth(depth), size(0)
+    : ID(0), slot(slot), format(format), width(width), height(height), depth(depth), size(0), f_texture_loaded(false)
 {
     glGenTextures(1, &ID);
 
     glActiveTexture(slot);
     glBindTexture(GL_TEXTURE_2D_ARRAY, ID);
 
-    // glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, format, width, height, depth, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-
     glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-    // glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 
     glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
 }
@@ -27,9 +23,7 @@ TextureArray::~TextureArray()
 {
 	if (TextureArray::is()) {
 		glDeleteTextures(1, &ID);
-
-        ID = 0;
-        is_loaded = false;
+        f_texture_loaded = false;
 	}
 }
 
@@ -46,12 +40,12 @@ void TextureArray::unbind()
 
 bool TextureArray::is()
 {
-	return (ID != 0) && is_loaded && glIsTexture(ID);
+	return (ID != 0) && glIsTexture(ID);
 }
 
 bool TextureArray::load(const std::string& path, int layers)
 {
-    if (TextureArray::is() && depth == size) {
+    if (TextureArray::is() && f_texture_loaded && depth == size) {
         Console::Warn("Texture array already loaded.", { "Path: " + path });
         return false;
     }
@@ -83,7 +77,7 @@ bool TextureArray::load(const std::string& path, int layers)
         TextureArray::unbind();
 
         stbi_image_free(data);
-        is_loaded = true;
+        f_texture_loaded = true;
         size += layers;
 
         Console::Info("Texture array loaded successfully.", {
@@ -94,12 +88,12 @@ bool TextureArray::load(const std::string& path, int layers)
     else {
         Console::Warn("Failed to load texture.", { "Path: " + path });
     }
-    return is_loaded;
+    return f_texture_loaded;
 }
 
 void TextureArray::loadInitTextureArray()
 {
-    if (!TextureArray::is()) {
+    if (!f_texture_loaded) {
         glTexImage3D(
             GL_TEXTURE_2D_ARRAY, 0, TextureArray::format,
             TextureArray::width, TextureArray::height, TextureArray::depth, 0,
@@ -126,8 +120,11 @@ void TextureArray::loadLayers(unsigned char* data, int width, int height, int ch
             }
         }
 
-        glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, size + depth, TextureArray::width, TextureArray::height, 1, (channels == 4) ? GL_RGBA : GL_RGB, GL_UNSIGNED_BYTE, data_tmp);
+        glTexSubImage3D(
+            GL_TEXTURE_2D_ARRAY, 0, 0, 0, size + depth,
+            TextureArray::width, TextureArray::height, 1, (channels == 4) ? GL_RGBA : GL_RGB,
+            GL_UNSIGNED_BYTE, data_tmp
+        );
         delete[] data_tmp;
     }
-    // glGenerateMipmap(GL_TEXTURE_2D_ARRAY);
 }

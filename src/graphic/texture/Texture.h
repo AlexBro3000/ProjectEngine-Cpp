@@ -9,7 +9,7 @@ private:
 	GLenum slot;
     GLint format;
 
-	bool is_loaded;
+	bool f_texture_loaded;
 
 	friend class TextureManager;
 

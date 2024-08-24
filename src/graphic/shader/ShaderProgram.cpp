@@ -10,7 +10,6 @@ ShaderProgram::~ShaderProgram()
 {
 	if (ShaderProgram::is()) {
 		glDeleteProgram(ID);
-		ID = 0;
 	}
 }
 
