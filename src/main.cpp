@@ -5,6 +5,8 @@
 #include <glad/glad.h>
 #include <thread>
 
+//#include <iostream>
+
 #define WIDTH  1000
 #define HEIGHT 1000
 #define TITLE  "WINDOW"
@@ -27,6 +29,15 @@ void Init(int argc, char** argv)
 
     TextureManager::TextureArray::load("Block", GL_TEXTURE0, GL_RGB, 256, 256, 32);
     TextureManager::TextureArray::loadTexture("Block", "\\res\\textures\\Block.png", 4);
+
+    TextureManager::TextureArray::load("BlockHeight", GL_TEXTURE1, GL_RGB, 256, 256, 32);
+    TextureManager::TextureArray::loadTexture("BlockHeight", "\\res\\textures\\BlockHeight.png", 4);
+
+    TextureManager::TextureArray::load("BlockNormal", GL_TEXTURE2, GL_RGB, 256, 256, 32);
+    TextureManager::TextureArray::loadTexture("BlockNormal", "\\res\\textures\\BlockNormal.png", 4);
+
+    TextureManager::TextureArray::load("BlockSpecular", GL_TEXTURE3, GL_RGB, 256, 256, 32);
+    TextureManager::TextureArray::loadTexture("BlockSpecular", "\\res\\textures\\BlockSpecular.png", 4);
 }
 
 void Terminate()
@@ -42,12 +53,6 @@ void Terminate()
 int main(int argc, char** argv)
 {
     Init(argc, argv);
-
-    // SHADER PROGRAM //
-    ShaderProgram* shader = ShaderManager::ShaderProgram::get("Main").get();
-
-    // TEXTURE //
-    TextureArray* texture = TextureManager::TextureArray::get("Block").get();
 
     // MESH
     Mesh mesh;
@@ -76,7 +81,7 @@ int main(int argc, char** argv)
     float crntTime = glfwGetTime();
     float delta_time;
 
-    glEnable(GL_CULL_FACE);  // Отбражение лицевой стороны
+    glEnable(GL_CULL_FACE);
 
     while (!Window::isShouldClose()) {
 
@@ -129,11 +134,13 @@ int main(int argc, char** argv)
 
         glClear(GL_COLOR_BUFFER_BIT);
 
+        ShaderProgram* shader = ShaderManager::ShaderProgram::get("Main").get();
         shader->use();
         shader->setUniform("model", model);
         shader->setUniform("projview", camera.getProjection() * camera.getView());
+        shader->setUniform("u_texture", 0);
 
-        texture->bind();
+        TextureManager::TextureArray::get("Block")->bind();
         mesh.render();
 
         Window::swapBuffer();

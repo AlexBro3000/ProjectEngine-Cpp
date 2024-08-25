@@ -1,7 +1,7 @@
 #pragma once
-#include "../Object.h"
+#include "../AdvancedObject.h"
 
-class Camera : public Object
+class Camera : public AdvancedObject
 {
 private:
 	float fov;
@@ -9,14 +9,15 @@ private:
 	float far;
 
 public:
-	Camera(const glm::vec3& position, const glm::ivec3& position_offset, const glm::vec3& rotation, float fov, float near, float far);
+	Camera(const glm::ivec3& position, const glm::vec3& offset, const glm::vec3& rotation, float fov, float near, float far);
 	~Camera() = default;
+
+	void move(const glm::vec3& position) override;
+	void rotate(const glm::vec3& rotation) override;
 
 	glm::mat4 getProjection();
 	glm::mat4 getView();
 
-	void move(const glm::vec3& position);
-	void rotate(const glm::vec3& rotation);
-
 private:
+
 };
