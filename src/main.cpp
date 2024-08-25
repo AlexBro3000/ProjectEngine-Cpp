@@ -1,7 +1,10 @@
 #include "graphic/mesh/Mesh.h"
 #include "manager/manager.hpp"
 #include "system/system.hpp"
+
 #include "object/camera/Camera.h"
+#include "world/chunk/Chunk.h"
+
 #include <glad/glad.h>
 #include <thread>
 
@@ -30,14 +33,11 @@ void Init(int argc, char** argv)
     TextureManager::TextureArray::load("Block", GL_TEXTURE0, GL_RGB, 256, 256, 32);
     TextureManager::TextureArray::loadTexture("Block", "\\res\\textures\\Block.png", 4);
 
-    TextureManager::TextureArray::load("BlockHeight", GL_TEXTURE1, GL_RGB, 256, 256, 32);
-    TextureManager::TextureArray::loadTexture("BlockHeight", "\\res\\textures\\BlockHeight.png", 4);
+    //TextureManager::TextureArray::load("BlockNormal", GL_TEXTURE2, GL_RGB, 256, 256, 32);
+    //TextureManager::TextureArray::loadTexture("BlockNormal", "\\res\\textures\\BlockNormal.png", 4);
 
-    TextureManager::TextureArray::load("BlockNormal", GL_TEXTURE2, GL_RGB, 256, 256, 32);
-    TextureManager::TextureArray::loadTexture("BlockNormal", "\\res\\textures\\BlockNormal.png", 4);
-
-    TextureManager::TextureArray::load("BlockSpecular", GL_TEXTURE3, GL_RGB, 256, 256, 32);
-    TextureManager::TextureArray::loadTexture("BlockSpecular", "\\res\\textures\\BlockSpecular.png", 4);
+    //TextureManager::TextureArray::load("BlockSpecular", GL_TEXTURE3, GL_RGB, 256, 256, 32);
+    //TextureManager::TextureArray::loadTexture("BlockSpecular", "\\res\\textures\\BlockSpecular.png", 4);
 }
 
 void Terminate()
@@ -55,31 +55,36 @@ int main(int argc, char** argv)
     Init(argc, argv);
 
     // MESH
-    Mesh mesh;
-    mesh.build(
-        {
-            Vertex({-0.25f, -0.25f, 0.0f}, {0.0f, 0.0f}, 0),
-            Vertex({ 0.25f, -0.25f, 0.0f}, {1.0f, 0.0f}, 0),
-            Vertex({ 0.25f,  0.25f, 0.0f}, {1.0f, 1.0f}, 0),
-            Vertex({-0.25f,  0.25f, 0.0f}, {0.0f, 1.0f}, 0),
-        }, {
-            0, 1, 2,
-            0, 2, 3,
-        }, GL_STATIC_DRAW);
+    Chunk chunk;
+    Mesh* mesh = chunk.buildMesh();
+    //Mesh mesh;
+    //mesh.build(
+    //    {
+    //        Vertex({-0.25f, -0.25f, 0.0f}, {0.0f, 0.0f}, 0),
+    //        Vertex({ 0.25f, -0.25f, 0.0f}, {1.0f, 0.0f}, 0),
+    //        Vertex({ 0.25f,  0.25f, 0.0f}, {1.0f, 1.0f}, 0),
+    //        Vertex({-0.25f,  0.25f, 0.0f}, {0.0f, 1.0f}, 0),
+    //    }, {
+    //        0, 1, 2,
+    //        0, 2, 3,
+    //    }, GL_STATIC_DRAW);
 
     // CAMERA
-    Camera camera = Camera(glm::vec3(0.0f, 0.0f, 1.0f), glm::ivec3(0), glm::vec3(0.0f), 80.0f, 0.1f, 100.0f);
+    Camera camera = Camera(glm::vec3(0.0f, 0.0f, 1.0f), glm::ivec3(0), glm::vec3(0.0f, -90.0f, 0.0f), 80.0f, 0.1f, 100.0f);
 
     //auto stoneBlock = BlockRegistry::CreateBlock("stone");
     //if (stoneBlock) {
     //    Console::Info("Block name.", { stoneBlock->GetName() });;
     //}
 
+
     glm::mat4 model = glm::mat4(1.0f);
 
-    float FPS = 1.0f / 100.0f;
+    float FPS = 1.0f / 40.0f;
     float crntTime = glfwGetTime();
     float delta_time;
+
+    float speed = 8.0f;
 
     glEnable(GL_CULL_FACE);
 
@@ -106,22 +111,22 @@ int main(int argc, char** argv)
             }
 
             if (Event::Keyboard::isHeld(GLFW_KEY_W)) {
-                camera.move(glm::vec3(0, 0, 1.0f) * delta_time);
+                camera.move(glm::vec3(0, 0, 1.0f) * delta_time * speed);
             }
             if (Event::Keyboard::isHeld(GLFW_KEY_S)) {
-                camera.move(glm::vec3(0, 0, -1.0f) * delta_time);
+                camera.move(glm::vec3(0, 0, -1.0f) * delta_time * speed);
             }
             if (Event::Keyboard::isHeld(GLFW_KEY_D)) {
-                camera.move(glm::vec3(1.0f, 0, 0) * delta_time);
+                camera.move(glm::vec3(1.0f, 0, 0) * delta_time * speed);
             }
             if (Event::Keyboard::isHeld(GLFW_KEY_A)) {
-                camera.move(glm::vec3(-1.0f, 0, 0) * delta_time);
+                camera.move(glm::vec3(-1.0f, 0, 0) * delta_time * speed);
             }
             if (Event::Keyboard::isHeld(GLFW_KEY_SPACE)) {
-                camera.move(glm::vec3(0, 1.0f, 0) * delta_time);
+                camera.move(glm::vec3(0, 1.0f, 0) * delta_time * speed);
             }
             if (Event::Keyboard::isHeld(GLFW_KEY_LEFT_SHIFT)) {
-                camera.move(glm::vec3(0, -1.0f, 0) * delta_time);
+                camera.move(glm::vec3(0, -1.0f, 0) * delta_time * speed);
             }
             if (Event::Mouse::isLocked()) {
                 camera.rotate(glm::vec3(
@@ -141,7 +146,7 @@ int main(int argc, char** argv)
         shader->setUniform("u_texture", 0);
 
         TextureManager::TextureArray::get("Block")->bind();
-        mesh.render();
+        mesh->render();
 
         Window::swapBuffer();
         Event::update();
