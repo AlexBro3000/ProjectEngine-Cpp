@@ -17,10 +17,10 @@ public:
     glm::ivec3 getPosition() const;
     glm::vec3 getOffset() const;
 
-    void setPosition(const glm::ivec3& position);
-    void setOffset(const glm::vec3& offset);
+    virtual void setPosition(const glm::ivec3& position);
+    virtual void setOffset(const glm::vec3& offset);
 
 private:
-    void updatePosition();
+    virtual void updatePosition();
 
 };

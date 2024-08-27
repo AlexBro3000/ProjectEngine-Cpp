@@ -29,6 +29,6 @@ glm::mat4 Camera::getProjection()
 
 glm::mat4 Camera::getView()
 {
-	glm::vec3 pos = offset + (glm::vec3)position;
-	return glm::lookAt(pos, pos + forward, up);
+	glm::vec3 position = glm::vec3(0.0f);
+	return glm::lookAt(position, position + forward, up);
 }

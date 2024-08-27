@@ -12,8 +12,6 @@ protected:
     BaseObject() = default;
     virtual ~BaseObject() = default;
 
-    virtual void render() const {}
-
 private:
 
 };

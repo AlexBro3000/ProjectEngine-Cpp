@@ -40,12 +40,24 @@ void Mesh::build(const std::vector<Vertex> vertices, const std::vector<unsigned 
     glBindVertexArray(VAO);
 
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &vertices[0], usage);
+    if (!vertices.empty()) {
+        glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &vertices[0], usage);
+    }
+    else {
+        glBufferData(GL_ARRAY_BUFFER, 0, nullptr, usage);
+    }
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], usage);
+    if (!indices.empty()) {
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], usage);
+    }
+    else {
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, 0, nullptr, usage);
+    }
 
-    Vertex::Attrib();
+    if (!vertices.empty()) {
+        Vertex::Attrib();
+    }
     count = indices.size();
 
     glBindVertexArray(0);

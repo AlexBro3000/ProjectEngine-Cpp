@@ -75,7 +75,7 @@ void AdvancedObject::updatePosition()
             position[i] += delta;
 			offset[i] -= delta;
         }
-        else if (position[i] < 0.0f) {
+        else if (offset[i] < 0.0f) {
             int delta = static_cast<int>(-offset[i]) + 1;
             position[i] -= delta;
 			offset[i] += delta;

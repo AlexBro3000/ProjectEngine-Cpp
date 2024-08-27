@@ -28,12 +28,12 @@ public:
     glm::vec3 getRight() const;
     glm::vec3 getUp() const;
 
-    void setPosition(const glm::ivec3& position);
-    void setOffset(const glm::vec3& offset);
-    void setRotation(const glm::vec3& rotation);
+    virtual void setPosition(const glm::ivec3& position);
+    virtual void setOffset(const glm::vec3& offset);
+    virtual void setRotation(const glm::vec3& rotation);
 
 private:
-    void updatePosition();
-    void updateRotation();
+    virtual void updatePosition();
+    virtual void updateRotation();
 
 };

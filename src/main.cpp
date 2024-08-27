@@ -4,15 +4,23 @@
 
 #include "object/camera/Camera.h"
 #include "world/chunk/Chunk.h"
+#include "world/chunk/ChunkController.h"
 
 #include <glad/glad.h>
+#include <iostream>
 #include <thread>
-
-//#include <iostream>
 
 #define WIDTH  1000
 #define HEIGHT 1000
 #define TITLE  "WINDOW"
+
+float FPS = 1.0f / 40.0f;
+float crntTime = glfwGetTime();
+float delta_time;
+
+float speed = 40.0f;
+
+
 
 void Init(int argc, char** argv)
 {
@@ -54,47 +62,34 @@ int main(int argc, char** argv)
 {
     Init(argc, argv);
 
-    // MESH
-    Chunk chunk;
-    Mesh* mesh = chunk.buildMesh();
-    //Mesh mesh;
-    //mesh.build(
-    //    {
-    //        Vertex({-0.25f, -0.25f, 0.0f}, {0.0f, 0.0f}, 0),
-    //        Vertex({ 0.25f, -0.25f, 0.0f}, {1.0f, 0.0f}, 0),
-    //        Vertex({ 0.25f,  0.25f, 0.0f}, {1.0f, 1.0f}, 0),
-    //        Vertex({-0.25f,  0.25f, 0.0f}, {0.0f, 1.0f}, 0),
-    //    }, {
-    //        0, 1, 2,
-    //        0, 2, 3,
-    //    }, GL_STATIC_DRAW);
+    glm::ivec3 world_position = glm::ivec3(10000, 20, 0);          // 2 147 483 648
+    glm::vec3 world_offset    = glm::vec3(0.0f, 0.0f, 0.0f);
+    
+
 
     // CAMERA
-    Camera camera = Camera(glm::vec3(0.0f, 0.0f, 1.0f), glm::ivec3(0), glm::vec3(0.0f, -90.0f, 0.0f), 80.0f, 0.1f, 100.0f);
+    Camera camera = Camera(world_position, world_offset, glm::vec3(-90.0f, 0.0f, 0.0f), 80.0f, 0.1f, 10000.0f);
 
-    //auto stoneBlock = BlockRegistry::CreateBlock("stone");
-    //if (stoneBlock) {
-    //    Console::Info("Block name.", { stoneBlock->GetName() });;
-    //}
+    // CHUNK CONTROLLER
+    ChunkController* chunks = new ChunkController(camera.getPosition());
+    chunks->build();
 
 
-    glm::mat4 model = glm::mat4(1.0f);
 
-    float FPS = 1.0f / 40.0f;
-    float crntTime = glfwGetTime();
-    float delta_time;
-
-    float speed = 8.0f;
-
+    // Настройка
     glEnable(GL_CULL_FACE);
+    glEnable(GL_DEPTH_TEST);
 
     while (!Window::isShouldClose()) {
+        // std::cout << "Position: " << camera.getPosition().x << " " << camera.getPosition().y << " " << camera.getPosition().z << std::endl;
 
         // Стабилизация FPS
         {
             delta_time = glfwGetTime() - crntTime;
-            if (delta_time < FPS)
+            if (delta_time < FPS) {
                 std::this_thread::sleep_for(std::chrono::milliseconds((int)(1000.0f * (FPS - delta_time))));
+                delta_time = glfwGetTime() - crntTime;
+            }
             crntTime += delta_time;
         }
 
@@ -137,20 +132,31 @@ int main(int argc, char** argv)
             }
         }
 
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         ShaderProgram* shader = ShaderManager::ShaderProgram::get("Main").get();
         shader->use();
-        shader->setUniform("model", model);
         shader->setUniform("projview", camera.getProjection() * camera.getView());
         shader->setUniform("u_texture", 0);
 
         TextureManager::TextureArray::get("Block")->bind();
-        mesh->render();
+
+        for (size_t i = 0; i < CHUNK_COUNT_X * CHUNK_COUNT_Y * CHUNK_COUNT_Z; i++) {
+            Chunk* chunk = chunks->getChunks()[i];
+            Mesh* mesh = chunk->getMesh();
+
+            glm::vec3 position = (glm::vec3)(chunk->getPosition() - camera.getPosition()) + chunk->getOffset() - camera.getOffset() - 15.5f;
+            glm::mat4 model = glm::translate(glm::mat4(1.0f), position);
+
+            shader->setUniform("model", model);
+            mesh->render();
+        }
 
         Window::swapBuffer();
         Event::update();
     }
+
+    delete chunks;
 
     Terminate();
     return 0;
