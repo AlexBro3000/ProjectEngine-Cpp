@@ -1,4 +1,4 @@
-#include "graphic/mesh/Mesh.h"
+#include "graphic/batch/LineBatch.h"
 #include "manager/manager.hpp"
 #include "system/system.hpp"
 
@@ -34,7 +34,10 @@ void Init(int argc, char** argv)
     // SHADER PROGRAM
 
     ShaderManager::ShaderProgram::load("Main");
+    ShaderManager::ShaderProgram::load("ShaderLines");
+
     ShaderManager::ShaderProgram::loadShader("Main", "\\res\\shaders\\main_vert.glsl", "\\res\\shaders\\main_frag.glsl");
+    ShaderManager::ShaderProgram::loadShader("ShaderLines", "\\res\\shaders\\lines_vert.glsl", "\\res\\shaders\\lines_frag.glsl");
 
     // TEXTURE
 
@@ -62,17 +65,34 @@ int main(int argc, char** argv)
 {
     Init(argc, argv);
 
-    glm::ivec3 world_position = glm::ivec3(10000, 20, 0);          // 2 147 483 648
-    glm::vec3 world_offset    = glm::vec3(0.0f, 0.0f, 0.0f);
+    glm::ivec3 world_position = glm::ivec3(0, 20, 0);  // 2 147 483 648
+    glm::vec3 world_offset = glm::vec3(0.0f, 0.0f, 0.0f);
     
 
 
     // CAMERA
-    Camera camera = Camera(world_position, world_offset, glm::vec3(-90.0f, 0.0f, 0.0f), 80.0f, 0.1f, 10000.0f);
+    Camera camera = Camera(world_position, world_offset, glm::vec3(0.0f, 0.0f, 0.0f), 80.0f, 0.1f, 10000.0f);
 
     // CHUNK CONTROLLER
     ChunkController* chunks = new ChunkController(camera.getPosition());
     chunks->build();
+
+    // INTERFACE
+    LineBatch line_batch = LineBatch();
+    line_batch.setLineWidth(1.25f);
+    line_batch.addLine(
+        VertexPoint(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)),
+        VertexPoint(glm::vec3(10000.0f, 0.0f, 0.0f), glm::vec4(1.0f, 0.0f, 0.0f, 1.0f))
+    );
+    line_batch.addLine(
+        VertexPoint(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec4(0.0f, 1.0f, 0.0f, 1.0f)),
+        VertexPoint(glm::vec3(0.0f, 10000.0f, 0.0f), glm::vec4(0.0f, 1.0f, 0.0f, 1.0f))
+    );
+    line_batch.addLine(
+        VertexPoint(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec4(0.0f, 0.0f, 1.0f, 1.0f)),
+        VertexPoint(glm::vec3(0.0f, 0.0f, 10000.0f), glm::vec4(0.0f, 0.0f, 1.0f, 1.0f))
+    );
+    line_batch.build();
 
 
 
@@ -81,7 +101,6 @@ int main(int argc, char** argv)
     glEnable(GL_DEPTH_TEST);
 
     while (!Window::isShouldClose()) {
-        // std::cout << "Position: " << camera.getPosition().x << " " << camera.getPosition().y << " " << camera.getPosition().z << std::endl;
 
         // Ñòàáèëèçàöèÿ FPS
         {
@@ -134,13 +153,16 @@ int main(int argc, char** argv)
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        ShaderProgram* shader = ShaderManager::ShaderProgram::get("Main").get();
+        ShaderProgram* shader = nullptr;
+
+        // CHUNK CONTROLLER
+        shader = ShaderManager::ShaderProgram::get("Main").get();
         shader->use();
+
         shader->setUniform("projview", camera.getProjection() * camera.getView());
         shader->setUniform("u_texture", 0);
 
         TextureManager::TextureArray::get("Block")->bind();
-
         for (size_t i = 0; i < CHUNK_COUNT_X * CHUNK_COUNT_Y * CHUNK_COUNT_Z; i++) {
             Chunk* chunk = chunks->getChunks()[i];
             Mesh* mesh = chunk->getMesh();
@@ -151,6 +173,18 @@ int main(int argc, char** argv)
             shader->setUniform("model", model);
             mesh->render();
         }
+
+        // INTERFACE
+        shader = ShaderManager::ShaderProgram::get("ShaderLines").get();
+        shader->use();
+        
+        glm::vec3 position = (glm::vec3)(camera.getPosition()) + camera.getOffset();
+        glm::mat4 model = glm::translate(glm::mat4(1.0f), -position);
+
+        shader->setUniform("projview", camera.getProjection() * camera.getView());
+        shader->setUniform("model", model);
+        
+        line_batch.render();
 
         Window::swapBuffer();
         Event::update();
