@@ -1,19 +1,20 @@
 #pragma once
+#include <memory>
+
+#include "../../graphic/mesh/Mesh.h"
 #include "../../object/SimpleObject.h"
 
 #define CHUNK_SIZE_X 32
 #define CHUNK_SIZE_Y 32
 #define CHUNK_SIZE_Z 32
 
-class Mesh;
 class ChunkController;
 class Voxel;
 
-class Chunk: public SimpleObject
-{
+class Chunk: public SimpleObject {
 private:
 	Voxel* voxels;
-	Mesh* mesh;
+	std::shared_ptr<Mesh<VertexMesh>> mesh;
 
 	friend class ChunkController;
 
@@ -23,7 +24,7 @@ public:
 
 	void build(ChunkController* chunk_controller, int index);
 
-	Mesh* getMesh() const;
+	std::shared_ptr<Mesh<VertexMesh>> getMesh() const;
 
 private:
 	bool IS_BLOCKED(glm::ivec3 pos, int index, ChunkController* chunk_controller);

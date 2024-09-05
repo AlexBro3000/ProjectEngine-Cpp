@@ -1,8 +1,7 @@
 #pragma once
 #include <string>
 
-class ResourceManager
-{
+class ResourceManager {
 private:
 	static std::string path;
 

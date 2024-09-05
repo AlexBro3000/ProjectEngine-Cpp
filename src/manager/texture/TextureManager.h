@@ -1,13 +1,13 @@
 #pragma once
-#include "../../graphic/texture/Texture.h"
-#include "../../graphic/texture/TextureArray.h"
 #include <glad/glad.h>
 #include <map>
 #include <memory>
 #include <string>
 
-class TextureManager
-{
+#include "../../graphic/texture/Texture.h"
+#include "../../graphic/texture/TextureArray.h"
+
+class TextureManager {
 private:
     using TextureMap = std::map<std::string, std::shared_ptr<::Texture>>;
     static TextureMap textures;
@@ -19,22 +19,18 @@ public:
     static bool Init();
     static void Terminate();
 
-    class Texture
-    {
+    class Texture {
     public:
-        static bool load(const std::string& name, GLenum slot, GLint format);
+        static bool load(const std::string& name, GLenum slot, GLint format, const std::string& path);
         static void unload(const std::string& name);
         static std::shared_ptr<::Texture> get(const std::string& name);
-
-        static bool loadTexture(const std::string& name, const std::string& path);
 
     private:
         Texture() = delete;
         ~Texture() = delete;
     };
 
-    class TextureArray
-    {
+    class TextureArray {
     public:
         static bool load(const std::string& name, GLenum slot, GLint format, int width, int height, int depth);
         static void unload(const std::string& name);

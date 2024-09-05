@@ -3,8 +3,7 @@
 #include <GLFW/glfw3.h>
 #include <string>
 
-class Window
-{
+class Window {
 private:
     static GLFWwindow* window;
     static int width;

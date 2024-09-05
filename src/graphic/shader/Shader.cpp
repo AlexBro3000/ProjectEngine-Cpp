@@ -1,10 +1,11 @@
 #include "Shader.h"
-#include "../../system/console/Console.h"
 #include <fstream>
 #include <sstream>
 
-Shader::Shader(GLenum type, const std::string& path) :
-	ID(0)
+#include "../../system/console/Console.h"
+
+Shader::Shader(GLenum type, const std::string& path)
+	: ID(0)
 {
 	std::string shader_code_str = Shader::load(path);
 	const GLchar* shader_code = shader_code_str.c_str();

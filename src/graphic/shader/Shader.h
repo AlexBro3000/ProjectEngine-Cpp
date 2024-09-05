@@ -2,8 +2,7 @@
 #include <glad/glad.h>
 #include <string>
 
-class Shader
-{
+class Shader {
 private:
 	GLuint ID;
 

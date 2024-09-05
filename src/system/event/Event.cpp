@@ -1,4 +1,5 @@
 #include "Event.h"
+
 #include "../../system/console/Console.h"
 #include "../../system/window/Window.h"
 

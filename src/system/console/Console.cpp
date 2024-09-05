@@ -1,5 +1,6 @@
 #include "Console.h"
 #include <iostream>
+
 #include <Windows.h>
 
 void Console::Info(const std::string& message, const std::vector<std::string>& messages)

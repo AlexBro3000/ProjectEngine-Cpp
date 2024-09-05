@@ -1,4 +1,5 @@
 #include "ResourceManager.h"
+
 #include "../../system/console/Console.h"
 
 std::string ResourceManager::path;

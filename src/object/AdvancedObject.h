@@ -1,8 +1,7 @@
 #pragma once
 #include "BaseObject.h"
 
-class AdvancedObject : public BaseObject
-{
+class AdvancedObject : public BaseObject {
 protected:
     glm::ivec3 position;
     glm::vec3 offset;
@@ -12,14 +11,10 @@ protected:
     glm::vec3 right;
     glm::vec3 up;
 
-protected:
+public:
     AdvancedObject(const glm::ivec3& position, const glm::vec3& offset, const glm::vec3& rotation);
     virtual ~AdvancedObject() = default;
 
-    virtual void move(const glm::vec3& position);
-    virtual void rotate(const glm::vec3& rotation);
-
-public:
     glm::ivec3 getPosition() const;
     glm::vec3 getOffset() const;
     glm::vec3 getRotation() const;
@@ -31,6 +26,10 @@ public:
     virtual void setPosition(const glm::ivec3& position);
     virtual void setOffset(const glm::vec3& offset);
     virtual void setRotation(const glm::vec3& rotation);
+
+protected:
+    virtual void move(const glm::vec3& position);
+    virtual void rotate(const glm::vec3& rotation);
 
 private:
     virtual void updatePosition();

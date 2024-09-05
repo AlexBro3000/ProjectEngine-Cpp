@@ -8,8 +8,7 @@
 constexpr int MOUSE_BUTTON_SIZE = 8;
 constexpr int KEY_BUTTON_SIZE = 512;
 
-class Event
-{
+class Event {
 private:
     static glm::vec2 mouse_position;
     static glm::vec2 mouse_position_delta;
@@ -33,8 +32,7 @@ public:
     static void Terminate();
     static void update();
 
-    class Mouse
-    {
+    class Mouse {
     public:
         static glm::vec2 getPosition();
         static glm::vec2 getPositionDelta();
@@ -54,8 +52,7 @@ public:
         static bool isValidButton(int button);
     };
 
-    class Keyboard
-    {
+    class Keyboard {
     public:
         static bool isPressed(int key);
         static bool isReleased(int key);

@@ -3,11 +3,9 @@
 #include <glm/glm.hpp>
 #include <vector>
 
-#include "../../graphic/mesh/Vertex.h"
-
 template <typename VertexType>
-class Mesh {
-private:
+class Batch {
+protected:
     std::vector<VertexType> vertices;
     std::vector<unsigned int> indices;
 
@@ -15,44 +13,38 @@ private:
     size_t count;
 
 public:
-    Mesh() : VAO(0), VBO(0), EBO(0), count(0) {}
-    Mesh(const std::vector<VertexType> vertices, const std::vector<unsigned int> indices)
-        : vertices(vertices), indices(indices), VAO(0), VBO(0), EBO(0), count(0) {}
-    ~Mesh();
+    Batch() : VAO(0), VBO(0), EBO(0), count(0) {}
+    virtual ~Batch();
 
-    void build(GLenum usage, bool f_clear_data = true);
-    void render(GLenum primitive = GL_TRIANGLES) const;
+protected:
+    virtual void build(GLenum usage, bool f_clear_data = true);
+    virtual void render(GLenum primitive) const;
 
-    const std::vector<VertexType>& getVertices() const;
-    const std::vector<unsigned int>& getIndices() const;
-
-    void setData(const std::vector<VertexType>& vertices, const std::vector<unsigned int>& indices);
-
-    void clear();
+    virtual void clear();
 
 private:
-    Mesh(const Mesh&) = delete;
-    Mesh(Mesh&&) = delete;
+    Batch(const Batch&) = delete;
+    Batch(Batch&&) = delete;
 
-    Mesh& operator=(const Mesh&) = delete;
-    Mesh& operator=(Mesh&&) = delete;
+    Batch& operator=(const Batch&) = delete;
+    Batch& operator=(Batch&&) = delete;
 };
 
 
 
 template<typename VertexType>
-Mesh<VertexType>::~Mesh()
+inline Batch<VertexType>::~Batch()
 {
     if (VAO != 0) {
         glDeleteVertexArrays(1, &VAO);
         glDeleteBuffers(1, &VBO);
         glDeleteBuffers(1, &EBO);
     }
-    Mesh::clear();
+    Batch::clear();
 }
 
 template<typename VertexType>
-void Mesh<VertexType>::build(GLenum usage, bool f_clear_data)
+inline void Batch<VertexType>::build(GLenum usage, bool f_clear_data)
 {
     if (VAO == 0) {
         glGenVertexArrays(1, &VAO);
@@ -71,7 +63,6 @@ void Mesh<VertexType>::build(GLenum usage, bool f_clear_data)
         glBufferData(GL_ARRAY_BUFFER, 0, nullptr, usage);
     }
 
-
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     if (!indices.empty()) {
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(), usage);
@@ -85,12 +76,12 @@ void Mesh<VertexType>::build(GLenum usage, bool f_clear_data)
     glBindVertexArray(0);
 
     if (f_clear_data) {
-        clear();
+        Batch::clear();
     }
 }
 
 template<typename VertexType>
-void Mesh<VertexType>::render(GLenum primitive) const
+inline void Batch<VertexType>::render(GLenum primitive) const
 {
     glBindVertexArray(VAO);
     glDrawElements(primitive, static_cast<unsigned int>(count), GL_UNSIGNED_INT, 0);
@@ -98,27 +89,7 @@ void Mesh<VertexType>::render(GLenum primitive) const
 }
 
 template<typename VertexType>
-const std::vector<VertexType>& Mesh<VertexType>::getVertices() const
-{
-    return vertices;
-}
-
-template<typename VertexType>
-const std::vector<unsigned int>& Mesh<VertexType>::getIndices() const
-{
-    return indices;
-}
-
-template<typename VertexType>
-void Mesh<VertexType>::setData(const std::vector<VertexType>& vertices, const std::vector<unsigned int>& indices)
-{
-    Mesh::clear();
-    this->vertices = vertices;
-    this->indices = indices;
-}
-
-template<typename VertexType>
-void Mesh<VertexType>::clear()
+inline void Batch<VertexType>::clear()
 {
     this->vertices.clear();
     this->indices.clear();

@@ -1,21 +1,9 @@
 #include "AdvancedObject.h"
 
-AdvancedObject::AdvancedObject(const glm::ivec3& position, const glm::vec3& offset, const glm::vec3& rotation) :
-	position(position), offset(offset), rotation(rotation)
+AdvancedObject::AdvancedObject(const glm::ivec3& position, const glm::vec3& offset, const glm::vec3& rotation)
+	: position(position), offset(offset), rotation(rotation)
 {
 	AdvancedObject::updatePosition();
-	AdvancedObject::updateRotation();
-}
-
-void AdvancedObject::move(const glm::vec3& position)
-{
-	AdvancedObject::offset += position;
-	AdvancedObject::updatePosition();
-}
-
-void AdvancedObject::rotate(const glm::vec3& rotation)
-{
-	AdvancedObject::rotation += rotation;
 	AdvancedObject::updateRotation();
 }
 
@@ -64,6 +52,18 @@ void AdvancedObject::setOffset(const glm::vec3& offset)
 void AdvancedObject::setRotation(const glm::vec3& rotation)
 {
 	AdvancedObject::rotation = rotation;
+	AdvancedObject::updateRotation();
+}
+
+void AdvancedObject::move(const glm::vec3& position)
+{
+	AdvancedObject::offset += position;
+	AdvancedObject::updatePosition();
+}
+
+void AdvancedObject::rotate(const glm::vec3& rotation)
+{
+	AdvancedObject::rotation += rotation;
 	AdvancedObject::updateRotation();
 }
 

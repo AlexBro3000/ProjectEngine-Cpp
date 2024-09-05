@@ -6,12 +6,10 @@
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 
-class BaseObject
-{
+class BaseObject {
 protected:
     BaseObject() = default;
     virtual ~BaseObject() = default;
 
 private:
-
 };

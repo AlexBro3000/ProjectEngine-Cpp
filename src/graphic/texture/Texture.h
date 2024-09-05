@@ -2,27 +2,27 @@
 #include <glad/glad.h>
 #include <string>
 
-class Texture
-{
+class Texture {
 private:
 	GLuint ID;
-	GLenum slot;
-    GLint format;
+	GLuint slot, format;
 
 	bool f_texture_loaded;
 
 	friend class TextureManager;
 
 public:
-	Texture(GLenum slot, GLint format);
+	Texture(GLuint slot, GLuint format);
 	~Texture();
 
-	void bind();
-	void unbind();
+	void bind() const;
+	void unbind() const;
 
-	bool is();
+	bool is() const;
 
 private:
 	bool load(const std::string& path);
+	void loadInitTexture(int width, int height, GLenum pxl_format, GLenum pxl_type);
+	void loadTextureData(int width, int height, GLenum pxl_format, GLenum pxl_type, unsigned char* data);
 
 };

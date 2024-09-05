@@ -1,4 +1,5 @@
 #include "TextureManager.h"
+
 #include "../../manager/resource/ResourceManager.h"
 #include "../../system/console/Console.h"
 
@@ -27,14 +28,25 @@ void TextureManager::Terminate()
 /////     TEXTURE MAMAGER :: TEXTURE                                       /////
 ////////////////////////////////////////////////////////////////////////////////
 
-bool TextureManager::Texture::load(const std::string& name, GLenum slot, GLint format)
+bool TextureManager::Texture::load(const std::string& name, GLenum slot, GLint format, const std::string& path)
 {
     if (textures.find(name) != textures.end()) {
         Console::Warn("Texture manager", { "A texture with this name already exists.", "Name: " + name });
         return false;
     }
-    textures[name] = std::make_shared<::Texture>(slot, format);
-    return true;
+
+    std::shared_ptr<::Texture> texture = std::make_shared<::Texture>(slot, format);
+    bool flag = texture->load(ResourceManager::path + path);
+
+    if (flag && texture->is()) {
+        textures[name] = texture;
+        Console::Info("Texture manager", { "Texture loaded successfully.", "Name: " + name });
+        return true;
+    }
+    else {
+        Console::Warn("Texture manager", { "Failed to load texture.", "Name: " + name });
+        return false;
+    }
 }
 
 void TextureManager::Texture::unload(const std::string& name)
@@ -47,24 +59,6 @@ void TextureManager::Texture::unload(const std::string& name)
 std::shared_ptr<::Texture> TextureManager::Texture::get(const std::string& name)
 {
     return textures.at(name);
-}
-
-bool TextureManager::Texture::loadTexture(const std::string& name, const std::string& path)
-{
-    if (textures.find(name) != textures.end()) {
-        bool flag = textures[name]->load(ResourceManager::path + path);
-
-        if (flag && textures[name]->is()) {
-            Console::Info("Texture manager", { "Texture loaded successfully.", "Name: " + name });
-            return true;
-        }
-        else {
-            Console::Warn("Texture manager", { "Failed to load texture.", "Name: " + name });
-            return false;
-        }
-    }
-    Console::Warn("Texture manager", { "Failed to load texture. A texture with that name does not exist.", "Name: " + name });
-    return false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

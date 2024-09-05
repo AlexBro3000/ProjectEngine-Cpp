@@ -1,4 +1,5 @@
 #include "Window.h"
+
 #include "../../system/console/Console.h"
 
 GLFWwindow* Window::window = nullptr;

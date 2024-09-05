@@ -1,6 +1,7 @@
 #include "Image.h"
-#include "../../system/console/Console.h"
 #include <stb_image.h>
+
+#include "../../system/console/Console.h"
 
 unsigned char* Image::load(const std::string& path, int* width, int* height, int* channels)
 {

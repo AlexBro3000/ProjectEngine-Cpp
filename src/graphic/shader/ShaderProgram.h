@@ -1,16 +1,16 @@
 #pragma once
 #include <glad/glad.h>
+#include <glm/gtc/type_ptr.hpp>
 #include <string>
 
-class ShaderProgram
-{
+class ShaderProgram {
 private:
 	GLuint ID;
 
 	friend class ShaderManager;
 
 public:
-	ShaderProgram();
+	ShaderProgram() : ID(0) {}
 	~ShaderProgram();
 
 	template<typename T>
@@ -27,4 +27,24 @@ private:
 
 };
 
-#include "ShaderProgram.inl"
+
+
+template<typename T>
+void ShaderProgram::setUniform(const std::string& name, const T& value) const
+{
+	GLint location = getUniformLocation(name);
+	if (location != -1) {
+		if constexpr (std::is_same_v<T, float>) {
+			glUniform1f(location, value);
+		}
+		else if constexpr (std::is_same_v<T, int>) {
+			glUniform1i(location, value);
+		}
+		else if constexpr (std::is_same_v<T, glm::vec3>) {
+			glUniform3fv(location, 1, glm::value_ptr(value));
+		}
+		else if constexpr (std::is_same_v<T, glm::mat4>) {
+			glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(value));
+		}
+	}
+}

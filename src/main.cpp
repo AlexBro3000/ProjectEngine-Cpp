@@ -1,4 +1,6 @@
+#include "graphic/batch/MeshBatch.h"
 #include "graphic/batch/LineBatch.h"
+
 #include "manager/manager.hpp"
 #include "system/system.hpp"
 
@@ -10,17 +12,11 @@
 #include <iostream>
 #include <thread>
 
-#define WIDTH  1000
-#define HEIGHT 1000
-#define TITLE  "WINDOW"
-
 float FPS = 1.0f / 40.0f;
 float crntTime = glfwGetTime();
 float delta_time;
 
 float speed = 40.0f;
-
-
 
 void Init(int argc, char** argv)
 {
@@ -28,27 +24,18 @@ void Init(int argc, char** argv)
     ShaderManager::  Init();
     TextureManager:: Init();
 
-    Window::Init(WIDTH, HEIGHT, TITLE);
+    Window::Init(1000, 1000, "WINDOW");
     Event:: Init();
 
     // SHADER PROGRAM
 
-    ShaderManager::ShaderProgram::load("Main");
-    ShaderManager::ShaderProgram::load("ShaderLines");
-
-    ShaderManager::ShaderProgram::loadShader("Main", "\\res\\shaders\\main_vert.glsl", "\\res\\shaders\\main_frag.glsl");
-    ShaderManager::ShaderProgram::loadShader("ShaderLines", "\\res\\shaders\\lines_vert.glsl", "\\res\\shaders\\lines_frag.glsl");
+    ShaderManager::ShaderProgram::load("Main", "\\res\\shaders\\main_vert.glsl", "\\res\\shaders\\main_frag.glsl");
+    ShaderManager::ShaderProgram::load("ShaderLines", "\\res\\shaders\\lines_vert.glsl", "\\res\\shaders\\lines_frag.glsl");
 
     // TEXTURE
 
-    TextureManager::TextureArray::load("Block", GL_TEXTURE0, GL_RGB, 256, 256, 32);
+    TextureManager::TextureArray::load("Block", 0, GL_RGB, 256, 256, 32);
     TextureManager::TextureArray::loadTexture("Block", "\\res\\textures\\Block.png", 4);
-
-    //TextureManager::TextureArray::load("BlockNormal", GL_TEXTURE2, GL_RGB, 256, 256, 32);
-    //TextureManager::TextureArray::loadTexture("BlockNormal", "\\res\\textures\\BlockNormal.png", 4);
-
-    //TextureManager::TextureArray::load("BlockSpecular", GL_TEXTURE3, GL_RGB, 256, 256, 32);
-    //TextureManager::TextureArray::loadTexture("BlockSpecular", "\\res\\textures\\BlockSpecular.png", 4);
 }
 
 void Terminate()
@@ -65,7 +52,7 @@ int main(int argc, char** argv)
 {
     Init(argc, argv);
 
-    glm::ivec3 world_position = glm::ivec3(0, 20, 0);  // 2 147 483 648
+    glm::ivec3 world_position = glm::ivec3(0, 0, 0);
     glm::vec3 world_offset = glm::vec3(0.0f, 0.0f, 0.0f);
     
 
@@ -78,22 +65,33 @@ int main(int argc, char** argv)
     chunks->build();
 
     // INTERFACE
-    LineBatch line_batch = LineBatch();
-    line_batch.setLineWidth(1.25f);
-    line_batch.addLine(
-        VertexPoint(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)),
-        VertexPoint(glm::vec3(10000.0f, 0.0f, 0.0f), glm::vec4(1.0f, 0.0f, 0.0f, 1.0f))
-    );
-    line_batch.addLine(
-        VertexPoint(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec4(0.0f, 1.0f, 0.0f, 1.0f)),
-        VertexPoint(glm::vec3(0.0f, 10000.0f, 0.0f), glm::vec4(0.0f, 1.0f, 0.0f, 1.0f))
-    );
-    line_batch.addLine(
-        VertexPoint(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec4(0.0f, 0.0f, 1.0f, 1.0f)),
-        VertexPoint(glm::vec3(0.0f, 0.0f, 10000.0f), glm::vec4(0.0f, 0.0f, 1.0f, 1.0f))
-    );
-    line_batch.build();
+    LineBatch line_batch = LineBatch(camera.getPosition(), glm::vec3(0.0f), 1.5f);
+    line_batch.addMesh(
+        SimpleObject(glm::ivec3(0), glm::vec3(0.0f)),
+        Mesh<VertexPoint>({
+            VertexPoint(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)),
+            VertexPoint(glm::vec3(256.0f, 0.0f, 0.0f), glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)),
+            VertexPoint(glm::vec3(0.0f, 256.0f, 0.0f), glm::vec4(0.0f, 1.0f, 0.0f, 1.0f)),
+            VertexPoint(glm::vec3(0.0f, 0.0f, 256.0f), glm::vec4(0.0f, 0.0f, 1.0f, 1.0f))
+            }, { 0, 1, 0, 2, 0, 3 }
+    ));
+    line_batch.build(GL_STATIC_DRAW);
 
+    LineBatch line_batch_chunks = LineBatch(camera.getPosition(), glm::vec3(0.0f), 1.0f);
+    line_batch_chunks.addMesh(
+        SimpleObject(glm::ivec3(0), glm::vec3(0.0f)),
+        Mesh<VertexPoint>({
+            VertexPoint(glm::vec3(-32.0f, 32.0f, 32.0f), glm::vec4(0.8f, 0.8f, 0.8f, 1.0f)),
+            VertexPoint(glm::vec3(-32.0f, 32.0f, -32.0f), glm::vec4(0.8f, 0.8f, 0.8f, 1.0f)),
+            VertexPoint(glm::vec3(-32.0f, -32.0f, 32.0f), glm::vec4(0.8f, 0.8f, 0.8f, 1.0f)),
+            VertexPoint(glm::vec3(-32.0f, -32.0f, -32.0f), glm::vec4(0.8f, 0.8f, 0.8f, 1.0f)),
+            VertexPoint(glm::vec3(32.0f, 32.0f, 32.0f), glm::vec4(0.8f, 0.8f, 0.8f, 1.0f)),
+            VertexPoint(glm::vec3(32.0f, 32.0f, -32.0f), glm::vec4(0.8f, 0.8f, 0.8f, 1.0f)),
+            VertexPoint(glm::vec3(32.0f, -32.0f, 32.0f), glm::vec4(0.8f, 0.8f, 0.8f, 1.0f)),
+            VertexPoint(glm::vec3(32.0f, -32.0f, -32.0f), glm::vec4(0.8f, 0.8f, 0.8f, 1.0f)),
+            }, { 0, 1, 0, 2, 1, 3, 2, 3, 4, 5, 4, 6, 5, 7, 6, 7, 0, 4, 1, 5, 2, 6, 3, 7 }
+    ));
+    line_batch_chunks.build(GL_STATIC_DRAW);
 
 
     // ֽאסענמיךא
@@ -153,45 +151,82 @@ int main(int argc, char** argv)
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        ShaderProgram* shader = nullptr;
-
         // CHUNK CONTROLLER
-        shader = ShaderManager::ShaderProgram::get("Main").get();
-        shader->use();
+        {
+            ShaderProgram* shader = ShaderManager::ShaderProgram::get("Main").get();
+            shader->use();
 
-        shader->setUniform("projview", camera.getProjection() * camera.getView());
-        shader->setUniform("u_texture", 0);
+            shader->setUniform("projview", camera.getProjection() * camera.getView());
+            shader->setUniform("u_texture", 0);
 
-        TextureManager::TextureArray::get("Block")->bind();
-        for (size_t i = 0; i < CHUNK_COUNT_X * CHUNK_COUNT_Y * CHUNK_COUNT_Z; i++) {
-            Chunk* chunk = chunks->getChunks()[i];
-            Mesh* mesh = chunk->getMesh();
+            TextureManager::TextureArray::get("Block")->bind();
 
-            glm::vec3 position = (glm::vec3)(chunk->getPosition() - camera.getPosition()) + chunk->getOffset() - camera.getOffset() - 15.5f;
-            glm::mat4 model = glm::translate(glm::mat4(1.0f), position);
+            for (size_t i = 0; i < CHUNK_COUNT_X * CHUNK_COUNT_Y * CHUNK_COUNT_Z; i++) {
+                Chunk* chunk = chunks->getChunks()[i];
+                std::shared_ptr<Mesh<VertexMesh>> mesh = chunk->getMesh();
 
-            shader->setUniform("model", model);
-            mesh->render();
+                glm::vec3 position = (glm::vec3)(chunk->getPosition() - camera.getPosition()) + chunk->getOffset() - camera.getOffset() - 15.5f;
+                glm::mat4 model = glm::translate(glm::mat4(1.0f), position);
+
+                shader->setUniform("model", model);
+                mesh->render();
+            }
         }
 
         // INTERFACE
-        shader = ShaderManager::ShaderProgram::get("ShaderLines").get();
-        shader->use();
-        
-        glm::vec3 position = (glm::vec3)(camera.getPosition()) + camera.getOffset();
-        glm::mat4 model = glm::translate(glm::mat4(1.0f), -position);
+        {
+            glm::vec3 position = (glm::vec3)(camera.getPosition()) + camera.getOffset();
+            glm::mat4 model = glm::translate(glm::mat4(1.0f), -position);
 
-        shader->setUniform("projview", camera.getProjection() * camera.getView());
-        shader->setUniform("model", model);
-        
-        line_batch.render();
+            ShaderProgram* shader = ShaderManager::ShaderProgram::get("ShaderLines").get();
+            shader->use();
+            shader->setUniform("projview", camera.getProjection() * camera.getView());
+            shader->setUniform("model", model);
+
+            line_batch.render();
+            line_batch_chunks.render();
+        }
 
         Window::swapBuffer();
         Event::update();
     }
 
-    delete chunks;
-
     Terminate();
     return 0;
 }
+
+
+
+//line_batch.addMesh(
+//    SimpleObject(glm::ivec3(0), glm::vec3(0.0f)),
+//    Mesh<VertexPoint>({
+//        VertexPoint(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)),
+//        VertexPoint(glm::vec3(10000.0f, 0.0f, 0.0f), glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)),
+//        VertexPoint(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec4(0.0f, 1.0f, 0.0f, 1.0f)),
+//        VertexPoint(glm::vec3(0.0f, 10000.0f, 0.0f), glm::vec4(0.0f, 1.0f, 0.0f, 1.0f)),
+//        VertexPoint(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec4(0.0f, 0.0f, 1.0f, 1.0f)),
+//        VertexPoint(glm::vec3(0.0f, 0.0f, 10000.0f), glm::vec4(0.0f, 0.0f, 1.0f, 1.0f))
+//        }, { 0, 1, 2, 3, 4, 5 }
+//));
+
+//MeshBatch mesh_batch = MeshBatch(camera.getPosition(), glm::vec3(0.0f));
+//{
+//    for (size_t i = 0; i < CHUNK_COUNT_X * CHUNK_COUNT_Y * CHUNK_COUNT_Z; i++) {
+//        Chunk* chunk = chunks->getChunks()[i];
+//        auto* mesh = chunk->getMesh();
+//        mesh_batch.addMesh(SimpleObject(chunk->getPosition(), chunk->getOffset()), *mesh);
+//    }
+//}
+//mesh_batch.build(GL_DYNAMIC_DRAW, true);
+// 
+// 
+// 
+//ShaderProgram* shader = ShaderManager::ShaderProgram::get("Main").get();
+//shader->use();
+//glm::vec3 position = (glm::vec3)(mesh_batch.getPosition() - camera.getPosition()) + mesh_batch.getOffset() - camera.getOffset();
+//glm::mat4 model = glm::translate(glm::mat4(1.0f), position);
+//shader->setUniform("projview", camera.getProjection() * camera.getView());
+//shader->setUniform("model", model);
+//shader->setUniform("u_texture", 0);
+//TextureManager::TextureArray::get("Block")->bind();
+//mesh_batch.render();

@@ -2,32 +2,30 @@
 #include <glad/glad.h>
 #include <string>
 
-class TextureArray
-{
+class TextureArray {
 private:
     GLuint ID;
-    GLenum slot;
-    GLint format;
+    GLuint slot, format;
+
+    bool f_texture_loaded;
 
     int width, height, depth;
     int size;
 
-    bool f_texture_loaded;
-
     friend class TextureManager;
 
 public:
-    TextureArray(GLenum slot, GLint format, int width, int height, int depth);
+    TextureArray(GLuint slot, GLuint format, int width, int height, int depth);
     ~TextureArray();
 
-    void bind();
-    void unbind();
+    void bind() const;
+    void unbind() const;
 
-    bool is();
+    bool is() const;
 
 private:
     bool load(const std::string& path, int layers);
-    void loadInitTextureArray();
-    void loadLayers(unsigned char* data, int width, int height, int channels, int layers);
+    void loadInitTexture(int width, int height, GLenum pxl_format, GLenum pxl_type);
+    void loadTextureData(int width, int height, GLenum pxl_format, GLenum pxl_type, unsigned char* data, int img_width, int img_height, int channels, int layers);
 
 };

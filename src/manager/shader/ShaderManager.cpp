@@ -1,4 +1,5 @@
 #include "ShaderManager.h"
+
 #include "../../manager/resource/ResourceManager.h"
 #include "../../system/console/Console.h"
 
@@ -25,14 +26,25 @@ void ShaderManager::Terminate()
 /////     SHADER MANAGER :: SHADER PROGRAM                                 /////
 ////////////////////////////////////////////////////////////////////////////////
 
-bool ShaderManager::ShaderProgram::load(const std::string& name)
+bool ShaderManager::ShaderProgram::load(const std::string& name, const std::string& path_vert, const std::string& path_frag)
 {
 	if (shader_programs.find(name) != shader_programs.end()) {
 		Console::Warn("Shader manager", { "A shader program with this name already exists.", "Name: " + name });
 		return false;
 	}
-	shader_programs[name] = std::make_shared<::ShaderProgram>();
-	return true;
+
+	std::shared_ptr<::ShaderProgram> shader = std::make_shared<::ShaderProgram>();
+	bool flag = shader->load(ResourceManager::path + path_vert, ResourceManager::path + path_frag);
+
+	if (flag && shader->is()) {
+		shader_programs[name] = shader;
+		Console::Info("Shader manager", { "Shader program loaded successfully.", "Name: " + name });
+		return true;
+	}
+	else {
+		Console::Warn("Shader manager", { "Failed to load shader program.", "Name: " + name });
+		return false;
+	}
 }
 
 void ShaderManager::ShaderProgram::unload(const std::string& name)
@@ -45,22 +57,4 @@ void ShaderManager::ShaderProgram::unload(const std::string& name)
 std::shared_ptr<::ShaderProgram> ShaderManager::ShaderProgram::get(const std::string& name)
 {
 	return shader_programs.at(name);
-}
-
-bool ShaderManager::ShaderProgram::loadShader(const std::string& name, const std::string& path_vert, const std::string& path_frag)
-{
-	if (shader_programs.find(name) != shader_programs.end()) {
-		bool flag = shader_programs[name]->load(ResourceManager::path + path_vert, ResourceManager::path + path_frag);
-
-		if (flag && shader_programs[name]->is()) {
-			Console::Info("Shader manager", { "Shader program loaded successfully.", "Name: " + name });
-			return true;
-		}
-		else {
-			Console::Warn("Shader manager", { "Failed to load shader program.", "Name: " + name });
-			return false;
-		}
-	}
-	Console::Warn("Shader manager", { "Failed to load shader program. A shader program with that name does not exist.", "Name: " + name });
-	return false;
 }

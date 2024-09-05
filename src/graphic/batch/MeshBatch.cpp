@@ -1,6 +1,6 @@
-#include "LineBatch.h"
+#include "MeshBatch.h"
 
-void LineBatch::build(GLenum usage, bool f_clear_data)
+void MeshBatch::build(GLenum usage, bool f_clear_data)
 {
 	for (size_t i = 0; i < meshes.size(); i++) {
 		const auto& vertices = meshes[i]->getVertices();
@@ -10,7 +10,7 @@ void LineBatch::build(GLenum usage, bool f_clear_data)
 		glm::vec3 relative_offset = objects[i]->getOffset() - offset;
 
 		for (const auto& vertex : vertices) {
-			VertexPoint v = vertex;
+			VertexMesh v = vertex;
 			v.position += glm::vec3(relative_position) + relative_offset;
 			Batch::vertices.push_back(v);
 		}
@@ -25,24 +25,23 @@ void LineBatch::build(GLenum usage, bool f_clear_data)
 	Batch::build(usage, f_clear_data);
 
 	if (f_clear_data) {
-		LineBatch::clear();
+		MeshBatch::clear();
 	}
 }
 
-void LineBatch::render() const
+void MeshBatch::render() const
 {
-	glLineWidth(line_width);
-	Batch::render(GL_LINES);
+	Batch::render(GL_TRIANGLES);
 }
 
-void LineBatch::clear()
+void MeshBatch::clear()
 {
 	Batch::clear();
 	objects.clear();
 	meshes.clear();
 }
 
-void LineBatch::addMesh(const SimpleObject& object, const std::shared_ptr<Mesh<VertexPoint>>& mesh_ptr)
+void MeshBatch::addMesh(const SimpleObject& object, const std::shared_ptr<Mesh<VertexMesh>>& mesh_ptr)
 {
 	std::shared_ptr<SimpleObject> object_ptr = std::make_shared<SimpleObject>(object.getPosition(), object.getOffset());
 	objects.push_back(object_ptr);
@@ -50,16 +49,11 @@ void LineBatch::addMesh(const SimpleObject& object, const std::shared_ptr<Mesh<V
 	meshes.push_back(mesh_ptr);
 }
 
-void LineBatch::addMesh(const SimpleObject& object, const Mesh<VertexPoint>& mesh)
+void MeshBatch::addMesh(const SimpleObject& object, const Mesh<VertexMesh>& mesh)
 {
 	std::shared_ptr<SimpleObject> object_ptr = std::make_shared<SimpleObject>(object.getPosition(), object.getOffset());
 	objects.push_back(object_ptr);
 
-	std::shared_ptr<Mesh<VertexPoint>> mesh_ptr = std::make_shared<Mesh<VertexPoint>>(mesh.getVertices(), mesh.getIndices());
+	std::shared_ptr<Mesh<VertexMesh>> mesh_ptr = std::make_shared<Mesh<VertexMesh>>(mesh.getVertices(), mesh.getIndices());
 	meshes.push_back(mesh_ptr);
-}
-
-void LineBatch::setLineWidth(float width)
-{
-	line_width = width;
 }

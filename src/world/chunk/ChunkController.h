@@ -7,8 +7,7 @@
 
 class Chunk;
 
-class ChunkController : public SimpleObject
-{
+class ChunkController : public SimpleObject {
 private:
 	Chunk** chunks;
 
@@ -23,5 +22,4 @@ public:
 	Chunk** getChunks() const;
 
 private:
-
 };

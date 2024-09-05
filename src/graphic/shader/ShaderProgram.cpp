@@ -1,10 +1,7 @@
 #include "ShaderProgram.h"
+
 #include "../../graphic/shader/Shader.h"
 #include "../../system/console/Console.h"
-
-ShaderProgram::ShaderProgram() :
-	ID(0)
-{ }
 
 ShaderProgram::~ShaderProgram()
 {

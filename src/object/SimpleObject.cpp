@@ -1,15 +1,9 @@
 #include "SimpleObject.h"
 
-SimpleObject::SimpleObject(const glm::ivec3& position, const glm::vec3& offset) :
-	position(position), offset(offset)
+SimpleObject::SimpleObject(const glm::ivec3& position, const glm::vec3& offset)
+    : position(position), offset(offset)
 {
 	SimpleObject::updatePosition();
-}
-
-void SimpleObject::move(const glm::vec3& position)
-{
-    SimpleObject::offset += position;
-    SimpleObject::updatePosition();
 }
 
 glm::ivec3 SimpleObject::getPosition() const
@@ -32,6 +26,12 @@ void SimpleObject::setOffset(const glm::vec3& offset)
 {
 	SimpleObject::offset = offset;
 	SimpleObject::updatePosition();
+}
+
+void SimpleObject::move(const glm::vec3& position)
+{
+    SimpleObject::offset += position;
+    SimpleObject::updatePosition();
 }
 
 void SimpleObject::updatePosition()
