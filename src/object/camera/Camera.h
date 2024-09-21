@@ -1,14 +1,14 @@
 #pragma once
-#include "../../object/AdvancedObject.h"
+#include "../../object/Object.h"
 
-class Camera : public AdvancedObject {
+class Camera : public ObjDCPs, public ObjDRs {
 private:
 	float fov;
 	float near, far;
 
 public:
 	Camera(const glm::ivec3& position, const glm::vec3& offset, const glm::vec3& rotation, float fov, float near, float far)
-		: AdvancedObject(position, offset, rotation), fov(fov), near(near), far(far) {}
+		: ObjDCPs(position, offset), ObjDRs(rotation), fov(fov), near(near), far(far) {}
 	~Camera() = default;
 
 	glm::mat4 getProjection() const;

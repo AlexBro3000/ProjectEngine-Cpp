@@ -21,10 +21,10 @@ void Camera::move(const glm::vec3& position)
 	pos += right * position.x;
 	pos += up * position.y;
 
-	AdvancedObject::move(pos);
+	ObjDCPs::move(pos);
 }
 
 void Camera::rotate(const glm::vec3& rotation)
 {
-	AdvancedObject::rotate(rotation);
+	ObjDRs::rotate(rotation);
 }

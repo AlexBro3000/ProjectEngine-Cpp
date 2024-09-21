@@ -15,9 +15,10 @@ private:
     size_t count;
 
 public:
-    Mesh() : VAO(0), VBO(0), EBO(0), count(0) {}
+    Mesh()
+        : VAO(0), VBO(0), EBO(0), count(0) {}
     Mesh(const std::vector<VertexType> vertices, const std::vector<unsigned int> indices)
-        : vertices(vertices), indices(indices), VAO(0), VBO(0), EBO(0), count(0) {}
+        : VAO(0), VBO(0), EBO(0), count(0), vertices(vertices), indices(indices) {}
     ~Mesh();
 
     void build(GLenum usage, bool f_clear_data = true);

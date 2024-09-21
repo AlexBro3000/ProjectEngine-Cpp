@@ -2,24 +2,26 @@
 
 void MeshBatch::build(GLenum usage, bool f_clear_data)
 {
+	size_t index_offset = 0;
+
 	for (size_t i = 0; i < meshes.size(); i++) {
+		glm::ivec3 position = objects[i].getPosition() - ObjSPs::position;
+
 		const auto& vertices = meshes[i]->getVertices();
 		const auto& indices = meshes[i]->getIndices();
 
-		glm::ivec3 relative_position = objects[i]->getPosition() - position;
-		glm::vec3 relative_offset = objects[i]->getOffset() - offset;
 
 		for (const auto& vertex : vertices) {
 			VertexMesh v = vertex;
-			v.position += glm::vec3(relative_position) + relative_offset;
+			v.position += glm::vec3(position);
 			Batch::vertices.push_back(v);
 		}
 
 		for (const auto& index : indices) {
-			Batch::indices.push_back(index + Batch::count);
+			Batch::indices.push_back(index_offset + index);
 		}
 
-		Batch::count += vertices.size();
+		index_offset += vertices.size();
 	}
 
 	Batch::build(usage, f_clear_data);
@@ -41,19 +43,14 @@ void MeshBatch::clear()
 	meshes.clear();
 }
 
-void MeshBatch::addMesh(const SimpleObject& object, const std::shared_ptr<Mesh<VertexMesh>>& mesh_ptr)
+void MeshBatch::addMesh(const ObjSPs& object, const std::shared_ptr<Mesh<VertexMesh>>& mesh_ptr)
 {
-	std::shared_ptr<SimpleObject> object_ptr = std::make_shared<SimpleObject>(object.getPosition(), object.getOffset());
-	objects.push_back(object_ptr);
-
+	objects.push_back(object);
 	meshes.push_back(mesh_ptr);
 }
 
-void MeshBatch::addMesh(const SimpleObject& object, const Mesh<VertexMesh>& mesh)
+void MeshBatch::addMesh(const ObjSPs& object, const Mesh<VertexMesh>& mesh)
 {
-	std::shared_ptr<SimpleObject> object_ptr = std::make_shared<SimpleObject>(object.getPosition(), object.getOffset());
-	objects.push_back(object_ptr);
-
 	std::shared_ptr<Mesh<VertexMesh>> mesh_ptr = std::make_shared<Mesh<VertexMesh>>(mesh.getVertices(), mesh.getIndices());
-	meshes.push_back(mesh_ptr);
+	MeshBatch::addMesh(object, mesh_ptr);
 }

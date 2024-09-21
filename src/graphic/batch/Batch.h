@@ -40,7 +40,6 @@ inline Batch<VertexType>::~Batch()
         glDeleteBuffers(1, &VBO);
         glDeleteBuffers(1, &EBO);
     }
-    Batch::clear();
 }
 
 template<typename VertexType>

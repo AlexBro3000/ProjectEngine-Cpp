@@ -7,6 +7,7 @@
 #include "object/camera/Camera.h"
 #include "world/chunk/Chunk.h"
 #include "world/chunk/ChunkController.h"
+#include "world/voxel/Voxel.hpp"
 
 #include <glad/glad.h>
 #include <iostream>
@@ -16,7 +17,7 @@ float FPS = 1.0f / 40.0f;
 float crntTime = glfwGetTime();
 float delta_time;
 
-float speed = 40.0f;
+float speed = 5.0f;
 
 void Init(int argc, char** argv)
 {
@@ -31,6 +32,7 @@ void Init(int argc, char** argv)
 
     ShaderManager::ShaderProgram::load("Main", "\\res\\shaders\\main_vert.glsl", "\\res\\shaders\\main_frag.glsl");
     ShaderManager::ShaderProgram::load("ShaderLines", "\\res\\shaders\\lines_vert.glsl", "\\res\\shaders\\lines_frag.glsl");
+    ShaderManager::ShaderProgram::load("Cursor", "\\res\\shaders\\cursor_vert.glsl", "\\res\\shaders\\cursor_frag.glsl");
 
     // TEXTURE
 
@@ -52,46 +54,31 @@ int main(int argc, char** argv)
 {
     Init(argc, argv);
 
-    glm::ivec3 world_position = glm::ivec3(0, 0, 0);
+    glm::ivec3 world_position = glm::ivec3(0, 3, 0);
     glm::vec3 world_offset = glm::vec3(0.0f, 0.0f, 0.0f);
     
 
 
     // CAMERA
-    Camera camera = Camera(world_position, world_offset, glm::vec3(0.0f, 0.0f, 0.0f), 80.0f, 0.1f, 10000.0f);
+    Camera camera = Camera(world_position, world_offset, glm::vec3(0.0f, 180.0f, 0.0f), 80.0f, 0.1f, 10000.0f);
 
     // CHUNK CONTROLLER
     ChunkController* chunks = new ChunkController(camera.getPosition());
-    chunks->build();
 
     // INTERFACE
-    LineBatch line_batch = LineBatch(camera.getPosition(), glm::vec3(0.0f), 1.5f);
-    line_batch.addMesh(
-        SimpleObject(glm::ivec3(0), glm::vec3(0.0f)),
-        Mesh<VertexPoint>({
-            VertexPoint(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)),
-            VertexPoint(glm::vec3(256.0f, 0.0f, 0.0f), glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)),
-            VertexPoint(glm::vec3(0.0f, 256.0f, 0.0f), glm::vec4(0.0f, 1.0f, 0.0f, 1.0f)),
-            VertexPoint(glm::vec3(0.0f, 0.0f, 256.0f), glm::vec4(0.0f, 0.0f, 1.0f, 1.0f))
-            }, { 0, 1, 0, 2, 0, 3 }
+    LineBatch cursor = LineBatch(glm::ivec3(0), 1.0f);
+    cursor.addMesh(
+        ObjSPs(glm::ivec3(0)), Mesh<VertexPoint>({
+            VertexPoint(glm::vec3(-0.01f, -0.01f, 0.0f), glm::vec4(0.8f, 0.8f, 0.8f, 1.0f)),
+            VertexPoint(glm::vec3( 0.01f,  0.01f, 0.0f), glm::vec4(0.8f, 0.8f, 0.8f, 1.0f)),
+            VertexPoint(glm::vec3(-0.01f,  0.01f, 0.0f), glm::vec4(0.8f, 0.8f, 0.8f, 1.0f)),
+            VertexPoint(glm::vec3( 0.01f, -0.01f, 0.0f), glm::vec4(0.8f, 0.8f, 0.8f, 1.0f)),
+            }, { 0, 1, 2, 3 }
     ));
-    line_batch.build(GL_STATIC_DRAW);
+    cursor.build(GL_STATIC_DRAW);
 
-    LineBatch line_batch_chunks = LineBatch(camera.getPosition(), glm::vec3(0.0f), 1.0f);
-    line_batch_chunks.addMesh(
-        SimpleObject(glm::ivec3(0), glm::vec3(0.0f)),
-        Mesh<VertexPoint>({
-            VertexPoint(glm::vec3(-32.0f, 32.0f, 32.0f), glm::vec4(0.8f, 0.8f, 0.8f, 1.0f)),
-            VertexPoint(glm::vec3(-32.0f, 32.0f, -32.0f), glm::vec4(0.8f, 0.8f, 0.8f, 1.0f)),
-            VertexPoint(glm::vec3(-32.0f, -32.0f, 32.0f), glm::vec4(0.8f, 0.8f, 0.8f, 1.0f)),
-            VertexPoint(glm::vec3(-32.0f, -32.0f, -32.0f), glm::vec4(0.8f, 0.8f, 0.8f, 1.0f)),
-            VertexPoint(glm::vec3(32.0f, 32.0f, 32.0f), glm::vec4(0.8f, 0.8f, 0.8f, 1.0f)),
-            VertexPoint(glm::vec3(32.0f, 32.0f, -32.0f), glm::vec4(0.8f, 0.8f, 0.8f, 1.0f)),
-            VertexPoint(glm::vec3(32.0f, -32.0f, 32.0f), glm::vec4(0.8f, 0.8f, 0.8f, 1.0f)),
-            VertexPoint(glm::vec3(32.0f, -32.0f, -32.0f), glm::vec4(0.8f, 0.8f, 0.8f, 1.0f)),
-            }, { 0, 1, 0, 2, 1, 3, 2, 3, 4, 5, 4, 6, 5, 7, 6, 7, 0, 4, 1, 5, 2, 6, 3, 7 }
-    ));
-    line_batch_chunks.build(GL_STATIC_DRAW);
+    LineBatch line_batch = LineBatch(camera.getPosition(), 2.5f);
+    
 
 
     // Настройка
@@ -140,15 +127,58 @@ int main(int argc, char** argv)
             if (Event::Keyboard::isHeld(GLFW_KEY_LEFT_SHIFT)) {
                 camera.move(glm::vec3(0, -1.0f, 0) * delta_time * speed);
             }
+
             if (Event::Mouse::isLocked()) {
                 camera.rotate(glm::vec3(
                     -Event::Mouse::getPositionDelta().y,
                     -Event::Mouse::getPositionDelta().x,
                     0.0f
                 ) * 0.05f);
+
+
+
+                glm::ivec3 ray_iend;
+                glm::vec3 ray_end;
+                glm::vec3 norm;
+
+                Voxel* voxel = chunks->rayCast(camera.getPosition(), camera.getOffset(), camera.getForward(), 100.0f, ray_iend, ray_end, norm);
+
+                if (voxel != nullptr) {
+                    bool flag = true;
+
+                    if (Event::Mouse::isPressed(GLFW_MOUSE_BUTTON_1)) {
+                        chunks->setVoxel(ray_iend, 0);
+                        flag = false;
+                    }
+                    if (Event::Mouse::isPressed(GLFW_MOUSE_BUTTON_2)) {
+                        chunks->setVoxel(ray_iend + (glm::ivec3)norm, 1);
+                        flag = false;
+                    }
+
+                    if (flag) {
+                        line_batch.addMesh(
+                            ObjSPs(ray_iend), Mesh<VertexPoint>({
+                                VertexPoint(glm::vec3(-0.01f, 1.01f, 1.01f), glm::vec4(0.8f, 0.8f, 0.8f, 1.0f)),
+                                VertexPoint(glm::vec3(-0.01f, 1.01f, -0.01f), glm::vec4(0.8f, 0.8f, 0.8f, 1.0f)),
+                                VertexPoint(glm::vec3(-0.01f, -0.01f, 1.01f), glm::vec4(0.8f, 0.8f, 0.8f, 1.0f)),
+                                VertexPoint(glm::vec3(-0.01f, -0.01f, -0.01f), glm::vec4(0.8f, 0.8f, 0.8f, 1.0f)),
+                                VertexPoint(glm::vec3(1.01f, 1.01f, 1.01f), glm::vec4(0.8f, 0.8f, 0.8f, 1.0f)),
+                                VertexPoint(glm::vec3(1.01f, 1.01f, -0.01f), glm::vec4(0.8f, 0.8f, 0.8f, 1.0f)),
+                                VertexPoint(glm::vec3(1.01f, -0.01f, 1.01f), glm::vec4(0.8f, 0.8f, 0.8f, 1.0f)),
+                                VertexPoint(glm::vec3(1.01f, -0.01f, -0.01f), glm::vec4(0.8f, 0.8f, 0.8f, 1.0f)),
+                                VertexPoint(ray_end, glm::vec4(1.0f, 1.0f, 0.0f, 1.0f)),
+                                VertexPoint(ray_end + 0.5f * norm, glm::vec4(1.0f, 1.0f, 0.0f, 1.0f)),
+                                }, { 0, 1, 0, 2, 1, 3, 2, 3, 4, 5, 4, 6, 5, 7, 6, 7, 0, 4, 1, 5, 2, 6, 3, 7, 8, 9 }
+                        ));
+                    }
+                    line_batch.build(GL_STATIC_DRAW);
+                }
             }
         }
 
+        chunks->build();
+
+        
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // CHUNK CONTROLLER
@@ -165,7 +195,7 @@ int main(int argc, char** argv)
                 Chunk* chunk = chunks->getChunks()[i];
                 std::shared_ptr<Mesh<VertexMesh>> mesh = chunk->getMesh();
 
-                glm::vec3 position = (glm::vec3)(chunk->getPosition() - camera.getPosition()) + chunk->getOffset() - camera.getOffset() - 15.5f;
+                glm::vec3 position = (glm::vec3)(chunk->getPosition() - camera.getPosition()) - camera.getOffset() - glm::vec3(CHUNK_SIZE_X / 2, CHUNK_SIZE_Y / 2, CHUNK_SIZE_Z / 2);
                 glm::mat4 model = glm::translate(glm::mat4(1.0f), position);
 
                 shader->setUniform("model", model);
@@ -175,8 +205,8 @@ int main(int argc, char** argv)
 
         // INTERFACE
         {
-            glm::vec3 position = (glm::vec3)(camera.getPosition()) + camera.getOffset();
-            glm::mat4 model = glm::translate(glm::mat4(1.0f), -position);
+            glm::vec3 position = (glm::vec3)(line_batch.getPosition() - camera.getPosition()) - camera.getOffset();
+            glm::mat4 model = glm::translate(glm::mat4(1.0f), position);
 
             ShaderProgram* shader = ShaderManager::ShaderProgram::get("ShaderLines").get();
             shader->use();
@@ -184,8 +214,11 @@ int main(int argc, char** argv)
             shader->setUniform("model", model);
 
             line_batch.render();
-            line_batch_chunks.render();
+            //line_batch_chunks.render();
         }
+
+        ShaderManager::ShaderProgram::get("Cursor")->use();
+        cursor.render();
 
         Window::swapBuffer();
         Event::update();

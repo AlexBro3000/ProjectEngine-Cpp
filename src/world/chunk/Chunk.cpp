@@ -4,27 +4,26 @@
 #include "../../world/voxel/Voxel.hpp"
 
 Chunk::Chunk(const glm::ivec3& position) :
-	SimpleObject(position, glm::vec3(0.0f))
+	ObjSPs(position), mesh(std::make_shared<Mesh<VertexMesh>>())
 {
+	glm::ivec3 pos_offset;
+	pos_offset.x = ObjSPs::position.x - CHUNK_SIZE_X / 2;
+	pos_offset.y = ObjSPs::position.y - CHUNK_SIZE_Y / 2;
+	pos_offset.z = ObjSPs::position.z - CHUNK_SIZE_Z / 2;
+
+
 	voxels = new Voxel[CHUNK_SIZE_X * CHUNK_SIZE_Y * CHUNK_SIZE_Z];
-	mesh = std::make_shared<Mesh<VertexMesh>>();
-
-	glm::ivec3 voxel_offset(CHUNK_SIZE_X / 2, CHUNK_SIZE_Y / 2, CHUNK_SIZE_Z / 2);
-
 	for (int y = 0; y < CHUNK_SIZE_Y; y++) {
 		for (int x = 0; x < CHUNK_SIZE_X; x++) {
 			for (int z = 0; z < CHUNK_SIZE_Z; z++) {
+				glm::ivec3 pos = glm::ivec3(x, y, z) + pos_offset;
 
+				int id = pos.y <= (sin(pos.x * 0.15f) * 0.5f + sin(pos.z * 0.15f) * 0.5f + 0.2f) * 10;
+				if (id != 0 && pos.y < 0)  id = 2;
+				if (id != 0 && pos.y < -5) id = 3;
 
-				glm::ivec3 voxel_position = glm::ivec3(x, y, z) + position;
-				voxel_position -= voxel_offset;
-
-				int id = voxel_position.y <= (sin(voxel_position.x * 0.15f) * 0.5f + 0.2f) * 10;
-
-				if (voxel_position.y < 0)   id = 2;
-				if (voxel_position.y < -10) id = 3;
-
-				voxels[(y * CHUNK_SIZE_X + x) * CHUNK_SIZE_Z + z].id = id;
+				size_t index = (y * CHUNK_SIZE_X + x) * CHUNK_SIZE_Z + z;
+				voxels[index].id = id;
 			}
 		}
 	}
@@ -53,10 +52,10 @@ void Chunk::build(ChunkController* chunk_controller, int index)
 				// X //
 
 				if (!IS_BLOCKED(glm::ivec3(x + 1, y, z), index, chunk_controller)) {
-					vertices.push_back(VertexMesh({ x + 0.5f, y - 0.5f, z + 0.5f }, { 0.0f, 0.0f }, id - 1));
-					vertices.push_back(VertexMesh({ x + 0.5f, y - 0.5f, z - 0.5f }, { 1.0f, 0.0f }, id - 1));
-					vertices.push_back(VertexMesh({ x + 0.5f, y + 0.5f, z - 0.5f }, { 1.0f, 1.0f }, id - 1));
-					vertices.push_back(VertexMesh({ x + 0.5f, y + 0.5f, z + 0.5f }, { 0.0f, 1.0f }, id - 1));
+					vertices.push_back(VertexMesh({ x + 1.0f, y, z + 1.0f }, { 0.0f, 0.0f }, id - 1));
+					vertices.push_back(VertexMesh({ x + 1.0f, y, z }, { 1.0f, 0.0f }, id - 1));
+					vertices.push_back(VertexMesh({ x + 1.0f, y + 1.0f, z }, { 1.0f, 1.0f }, id - 1));
+					vertices.push_back(VertexMesh({ x + 1.0f, y + 1.0f, z + 1.0f }, { 0.0f, 1.0f }, id - 1));
 
 					std::vector<int> values = { step + 0, step + 1, step + 2, step + 0, step + 2, step + 3 };
 					indices.insert(indices.end(), values.begin(), values.end());
@@ -64,10 +63,10 @@ void Chunk::build(ChunkController* chunk_controller, int index)
 					step += 4;
 				}
 				if (!IS_BLOCKED(glm::ivec3(x - 1, y, z), index, chunk_controller)) {
-					vertices.push_back(VertexMesh({ x - 0.5f, y - 0.5f, z - 0.5f }, { 0.0f, 0.0f }, id - 1));
-					vertices.push_back(VertexMesh({ x - 0.5f, y - 0.5f, z + 0.5f }, { 1.0f, 0.0f }, id - 1));
-					vertices.push_back(VertexMesh({ x - 0.5f, y + 0.5f, z + 0.5f }, { 1.0f, 1.0f }, id - 1));
-					vertices.push_back(VertexMesh({ x - 0.5f, y + 0.5f, z - 0.5f }, { 0.0f, 1.0f }, id - 1));
+					vertices.push_back(VertexMesh({ x, y, z }, { 0.0f, 0.0f }, id - 1));
+					vertices.push_back(VertexMesh({ x, y, z + 1.0f }, { 1.0f, 0.0f }, id - 1));
+					vertices.push_back(VertexMesh({ x, y + 1.0f, z + 1.0f }, { 1.0f, 1.0f }, id - 1));
+					vertices.push_back(VertexMesh({ x, y + 1.0f, z }, { 0.0f, 1.0f }, id - 1));
 
 					std::vector<int> values = { step + 0, step + 1, step + 2, step + 0, step + 2, step + 3 };
 					indices.insert(indices.end(), values.begin(), values.end());
@@ -78,10 +77,10 @@ void Chunk::build(ChunkController* chunk_controller, int index)
 				// Y //
 
 				if (!IS_BLOCKED(glm::ivec3(x, y + 1, z), index, chunk_controller)) {
-					vertices.push_back(VertexMesh({ x - 0.5f, y + 0.5f, z - 0.5f }, { 0.0f, 0.0f }, id - 1));
-					vertices.push_back(VertexMesh({ x - 0.5f, y + 0.5f, z + 0.5f }, { 1.0f, 0.0f }, id - 1));
-					vertices.push_back(VertexMesh({ x + 0.5f, y + 0.5f, z + 0.5f }, { 1.0f, 1.0f }, id - 1));
-					vertices.push_back(VertexMesh({ x + 0.5f, y + 0.5f, z - 0.5f }, { 0.0f, 1.0f }, id - 1));
+					vertices.push_back(VertexMesh({ x, y + 1.0f, z }, { 0.0f, 0.0f }, id - 1));
+					vertices.push_back(VertexMesh({ x, y + 1.0f, z + 1.0f }, { 1.0f, 0.0f }, id - 1));
+					vertices.push_back(VertexMesh({ x + 1.0f, y + 1.0f, z + 1.0f }, { 1.0f, 1.0f }, id - 1));
+					vertices.push_back(VertexMesh({ x + 1.0f, y + 1.0f, z }, { 0.0f, 1.0f }, id - 1));
 
 					std::vector<int> values = { step + 0, step + 1, step + 2, step + 0, step + 2, step + 3 };
 					indices.insert(indices.end(), values.begin(), values.end());
@@ -89,10 +88,10 @@ void Chunk::build(ChunkController* chunk_controller, int index)
 					step += 4;
 				}
 				if (!IS_BLOCKED(glm::ivec3(x, y - 1, z), index, chunk_controller)) {
-					vertices.push_back(VertexMesh({ x - 0.5f, y - 0.5f, z - 0.5f }, { 0.0f, 0.0f }, id - 1));
-					vertices.push_back(VertexMesh({ x + 0.5f, y - 0.5f, z - 0.5f }, { 1.0f, 0.0f }, id - 1));
-					vertices.push_back(VertexMesh({ x + 0.5f, y - 0.5f, z + 0.5f }, { 1.0f, 1.0f }, id - 1));
-					vertices.push_back(VertexMesh({ x - 0.5f, y - 0.5f, z + 0.5f }, { 0.0f, 1.0f }, id - 1));
+					vertices.push_back(VertexMesh({ x, y, z }, { 0.0f, 0.0f }, id - 1));
+					vertices.push_back(VertexMesh({ x + 1.0f, y, z }, { 1.0f, 0.0f }, id - 1));
+					vertices.push_back(VertexMesh({ x + 1.0f, y, z + 1.0f }, { 1.0f, 1.0f }, id - 1));
+					vertices.push_back(VertexMesh({ x, y, z + 1.0f }, { 0.0f, 1.0f }, id - 1));
 
 					std::vector<int> values = { step + 0, step + 1, step + 2, step + 0, step + 2, step + 3 };
 					indices.insert(indices.end(), values.begin(), values.end());
@@ -103,10 +102,10 @@ void Chunk::build(ChunkController* chunk_controller, int index)
 				// Z //
 
 				if (!IS_BLOCKED(glm::ivec3(x, y, z + 1), index, chunk_controller)) {
-					vertices.push_back(VertexMesh({ x - 0.5f, y - 0.5f, z + 0.5f }, { 0.0f, 0.0f }, id - 1));
-					vertices.push_back(VertexMesh({ x + 0.5f, y - 0.5f, z + 0.5f }, { 1.0f, 0.0f }, id - 1));
-					vertices.push_back(VertexMesh({ x + 0.5f, y + 0.5f, z + 0.5f }, { 1.0f, 1.0f }, id - 1));
-					vertices.push_back(VertexMesh({ x - 0.5f, y + 0.5f, z + 0.5f }, { 0.0f, 1.0f }, id - 1));
+					vertices.push_back(VertexMesh({ x, y, z + 1.0f }, { 0.0f, 0.0f }, id - 1));
+					vertices.push_back(VertexMesh({ x + 1.0f, y, z + 1.0f }, { 1.0f, 0.0f }, id - 1));
+					vertices.push_back(VertexMesh({ x + 1.0f, y + 1.0f, z + 1.0f }, { 1.0f, 1.0f }, id - 1));
+					vertices.push_back(VertexMesh({ x, y + 1.0f, z + 1.0f }, { 0.0f, 1.0f }, id - 1));
 
 					std::vector<int> values = { step + 0, step + 1, step + 2, step + 0, step + 2, step + 3 };
 					indices.insert(indices.end(), values.begin(), values.end());
@@ -114,10 +113,10 @@ void Chunk::build(ChunkController* chunk_controller, int index)
 					step += 4;
 				}
 				if (!IS_BLOCKED(glm::ivec3(x, y, z - 1), index, chunk_controller)) {
-					vertices.push_back(VertexMesh({ x + 0.5f, y - 0.5f, z - 0.5f }, { 0.0f, 0.0f }, id - 1));
-					vertices.push_back(VertexMesh({ x - 0.5f, y - 0.5f, z - 0.5f }, { 1.0f, 0.0f }, id - 1));
-					vertices.push_back(VertexMesh({ x - 0.5f, y + 0.5f, z - 0.5f }, { 1.0f, 1.0f }, id - 1));
-					vertices.push_back(VertexMesh({ x + 0.5f, y + 0.5f, z - 0.5f }, { 0.0f, 1.0f }, id - 1));
+					vertices.push_back(VertexMesh({ x + 1.0f, y, z }, { 0.0f, 0.0f }, id - 1));
+					vertices.push_back(VertexMesh({ x, y, z }, { 1.0f, 0.0f }, id - 1));
+					vertices.push_back(VertexMesh({ x, y + 1.0f, z }, { 1.0f, 1.0f }, id - 1));
+					vertices.push_back(VertexMesh({ x + 1.0f, y + 1.0f, z }, { 0.0f, 1.0f }, id - 1));
 
 					std::vector<int> values = { step + 0, step + 1, step + 2, step + 0, step + 2, step + 3 };
 					indices.insert(indices.end(), values.begin(), values.end());
@@ -132,9 +131,24 @@ void Chunk::build(ChunkController* chunk_controller, int index)
 	mesh->build(GL_STATIC_DRAW);
 }
 
+Voxel* Chunk::getVoxel(const glm::ivec3& position) const
+{
+	return &voxels[(position.y * CHUNK_SIZE_X + position.x) * CHUNK_SIZE_Z + position.z];
+}
+
+Voxel* Chunk::getVoxels() const
+{
+	return voxels;
+}
+
 std::shared_ptr<Mesh<VertexMesh>> Chunk::getMesh() const
 {
 	return mesh;
+}
+
+void Chunk::setVoxel(const glm::ivec3& position, uint16_t id)
+{
+	voxels[(position.y * CHUNK_SIZE_X + position.x) * CHUNK_SIZE_Z + position.z].id = id;
 }
 
 bool Chunk::IS_BLOCKED(glm::ivec3 pos, int index, ChunkController* chunk_controller)

@@ -1,11 +1,11 @@
 #pragma once
-//#include <stdint.h>
+#include <stdint.h>
 
 class Voxel {
 public:
-    unsigned int id;
+    uint16_t id;
 
     Voxel() : id(0) {}
-    Voxel(unsigned int id) : id(id) {}
+    Voxel(uint16_t id) : id(id) {}
 
 };
